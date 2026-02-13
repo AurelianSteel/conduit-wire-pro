@@ -8,6 +8,7 @@ import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
 export default function MotorCircuitScreen() {
   const { colors } = useTheme();
+  const accentColor = '#8b5cf6'; // Purple - matches home screen
   
   const [hp, setHP] = useState<MotorHP>('5');
   const [voltage, setVoltage] = useState<MotorVoltage>('240V-3ph');
@@ -50,7 +51,7 @@ export default function MotorCircuitScreen() {
             style={[
               styles.hpButton,
               { borderColor: colors.border },
-              hp === option && { backgroundColor: colors.success, borderColor: colors.success },
+              hp === option && { backgroundColor: accentColor, borderColor: accentColor },
             ]}
             onPress={() => setHP(option)}
           >
@@ -70,7 +71,7 @@ export default function MotorCircuitScreen() {
             style={[
               styles.voltageButton,
               { borderColor: colors.border },
-              voltage === v.value && { backgroundColor: colors.primary, borderColor: colors.primary },
+              voltage === v.value && { backgroundColor: accentColor, borderColor: accentColor },
             ]}
             onPress={() => setVoltage(v.value)}
           >
@@ -88,7 +89,7 @@ export default function MotorCircuitScreen() {
           style={[
             styles.toggleBtn,
             { borderColor: colors.border },
-            material === 'copper' && { backgroundColor: colors.success, borderColor: colors.success },
+            material === 'copper' && { backgroundColor: accentColor, borderColor: accentColor },
           ]}
           onPress={() => setMaterial('copper')}
         >
@@ -100,7 +101,7 @@ export default function MotorCircuitScreen() {
           style={[
             styles.toggleBtn,
             { borderColor: colors.border },
-            material === 'aluminum' && { backgroundColor: colors.success, borderColor: colors.success },
+            material === 'aluminum' && { backgroundColor: accentColor, borderColor: accentColor },
           ]}
           onPress={() => setMaterial('aluminum')}
         >
@@ -119,7 +120,7 @@ export default function MotorCircuitScreen() {
             style={[
               styles.terminalBtn,
               { borderColor: colors.border },
-              terminalRating === temp && { backgroundColor: colors.secondary, borderColor: colors.secondary },
+              terminalRating === temp && { backgroundColor: accentColor, borderColor: accentColor },
             ]}
             onPress={() => setTerminalRating(temp)}
           >
@@ -132,28 +133,36 @@ export default function MotorCircuitScreen() {
 
       {/* Continuous Load */}
       <View style={[styles.switchRow, { borderTopColor: colors.border }]}>
-        <Text style={[styles.label, { marginTop: 0, marginBottom: 0, color: colors.text }]}>
+        <Text style={[styles.switchLabel, { color: colors.text }]}>
           CONTINUOUS LOAD (3+ hours)
         </Text>
         <Switch
           value={continuousLoad}
           onValueChange={setContinuousLoad}
           trackColor={{ false: colors.border, true: colors.success }}
+          thumbColor="#fff"
         />
       </View>
 
-      {/* Results */}
+      {/* Results - Unified Card */}
       {result && (
-        <View style={[styles.resultCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
-          <Text style={[styles.resultTitle, { color: colors.text }]}>
-            Motor: {hp} HP @ {voltageOptions.find(v => v.value === voltage)?.label}
-          </Text>
-          <Text style={[styles.resultSubtitle, { color: colors.textSecondary }]}>
-            Full-Load Amps: {result.fla}A
-          </Text>
+        <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {/* Motor Spec Header */}
+          <View style={styles.resultHeader}>
+            <Text style={[styles.resultLabel, { color: colors.textSecondary }]}>
+              MOTOR SPECIFICATION
+            </Text>
+            <Text style={[styles.resultMotor, { color: accentColor }]}>
+              {hp} HP @ {voltageOptions.find(v => v.value === voltage)?.label}
+            </Text>
+            <Text style={[styles.resultFLA, { color: colors.text }]}>
+              Full-Load Amps: {result.fla}A
+            </Text>
+          </View>
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
+          {/* NEC Calculations */}
           <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CONDUCTOR SIZING (NEC 430.22)</Text>
           <Text style={[styles.resultValue, { color: colors.text }]}>
             Min Ampacity: {result.minConductorAmpacity}A
@@ -256,14 +265,24 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     marginBottom: Spacing.lg,
   },
+  switchLabel: {
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
   resultCard: {
     marginTop: Spacing.lg,
     padding: Spacing.lg,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
   },
-  resultTitle: { fontSize: FontSizes.lg, fontWeight: '700' },
-  resultSubtitle: { fontSize: FontSizes.md, marginTop: Spacing.xs },
+  resultHeader: {
+    alignItems: 'center',
+    paddingBottom: Spacing.md,
+  },
+  resultLabel: { fontSize: FontSizes.xs, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
+  resultMotor: { fontSize: FontSizes.xxl, fontWeight: '900', marginTop: Spacing.xs, textAlign: 'center' },
+  resultFLA: { fontSize: FontSizes.md, marginTop: Spacing.xs, fontWeight: '600', textAlign: 'center' },
   divider: {
     height: 1,
     marginVertical: Spacing.md,

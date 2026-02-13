@@ -2,8 +2,9 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { HistoryContext, useHistoryProvider } from '../src/hooks/useHistory';
 import { useTheme } from '../src/hooks/useTheme';
+import { SettingsProvider } from '../src/contexts/SettingsContext';
 
-export default function RootLayout() {
+function AppContent() {
   const { colors, isDark } = useTheme();
   const historyValue = useHistoryProvider();
 
@@ -23,7 +24,17 @@ export default function RootLayout() {
         <Stack.Screen name="calc/conduit-fill" options={{ title: 'Conduit Fill', headerBackTitle: 'Back', presentation: 'card' }} />
         <Stack.Screen name="calc/box-fill" options={{ title: 'Box Fill', headerBackTitle: 'Back', presentation: 'card' }} />
         <Stack.Screen name="calc/voltage-drop" options={{ title: 'Voltage Drop', headerBackTitle: 'Back', presentation: 'card' }} />
+        <Stack.Screen name="calc/wire-ampacity" options={{ title: 'Wire Ampacity', headerBackTitle: 'Back', presentation: 'card' }} />
+        <Stack.Screen name="calc/motor-circuit" options={{ title: 'Motor Circuit', headerBackTitle: 'Back', presentation: 'card' }} />
       </Stack>
     </HistoryContext.Provider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SettingsProvider>
+      <AppContent />
+    </SettingsProvider>
   );
 }
