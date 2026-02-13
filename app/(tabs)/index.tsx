@@ -43,6 +43,13 @@ export default function HomeScreen() {
       route: '/calc/wire-ampacity',
       color: '#f59e0b', // Amber
     },
+    {
+      title: 'Motor Circuit',
+      subtitle: 'Size motor branch circuits',
+      icon: 'settings-outline',
+      route: '/calc/motor-circuit',
+      color: '#8b5cf6', // Purple
+    },
   ];
 
   return (
@@ -50,7 +57,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Four essential calculators for electricians
+          Five essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>
@@ -64,8 +71,10 @@ export default function HomeScreen() {
             <View style={[styles.iconContainer, { backgroundColor: calc.color + '20' }]}>
               <Ionicons name={calc.icon} size={32} color={calc.color} />
             </View>
-            <Text style={[styles.cardTitle, { color: colors.text }]}>{calc.title}</Text>
-            <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>{calc.subtitle}</Text>
+            <View style={styles.cardContent}>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{calc.title}</Text>
+              <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>{calc.subtitle}</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -93,6 +102,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'center',
   },
   cardTitle: { fontSize: 18, fontWeight: '700' },
   cardSubtitle: { fontSize: 14, marginTop: 2 },

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
+import { useSettings } from '../../src/hooks/useSettings';
 import { systemVoltages, ConductorMaterial, PhaseType } from '../../src/data/resistance-data';
 import {
   recommendWire,
@@ -22,11 +23,15 @@ import { useHistory } from '../../src/hooks/useHistory';
 
 export default function VoltageDropScreen() {
   const { colors } = useTheme();
+  const { settings } = useSettings();
   const { addEntry } = useHistory();
+
+  // Map settings material to ConductorMaterial type
+  const defaultMaterial: ConductorMaterial = settings.defaultMaterial === 'Cu' ? 'copper' : 'aluminum';
 
   // Input state
   const [voltageIdx, setVoltageIdx] = useState(0); // 120V 1Φ
-  const [material, setMaterial] = useState<ConductorMaterial>('copper');
+  const [material, setMaterial] = useState<ConductorMaterial>(defaultMaterial);
   const [current, setCurrent] = useState('20');
   const [distance, setDistance] = useState('100');
   const [showResults, setShowResults] = useState(false);
