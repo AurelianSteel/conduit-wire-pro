@@ -25,10 +25,15 @@ export default function MotorCircuitScreen() {
         terminalRating,
         continuousLoad
       });
-    } catch {
+    } catch (error) {
       return null;
     }
   }, [hp, voltage, material, terminalRating, continuousLoad]);
+
+  // Check if HP/voltage combo is valid
+  const isFractionalHP = ['1/6', '1/4', '1/3', '1/2', '3/4', '1'].includes(hp);
+  const isThreePhase = voltage.includes('3ph');
+  const showInvalidComboError = isFractionalHP && isThreePhase;
 
   const hpOptions: MotorHP[] = ['1/6', '1/4', '1/3', '1/2', '3/4', '1', '1.5', '2', '3', '5', '7.5', '10', '15', '20', '25', '30', '40', '50', '60', '75', '100', '125', '150', '200'];
   
@@ -144,8 +149,21 @@ export default function MotorCircuitScreen() {
         />
       </View>
 
+      {/* Error Card - Invalid Combo */}
+      {showInvalidComboError && (
+        <View style={[styles.errorCard, { backgroundColor: colors.surface, borderColor: colors.warning }]}>
+          <Text style={[styles.errorIcon, { color: colors.warning }]}>⚠️</Text>
+          <Text style={[styles.errorTitle, { color: colors.warning }]}>Invalid Motor Configuration</Text>
+          <Text style={[styles.errorMessage, { color: colors.textSecondary }]}>
+            Fractional HP motors (1/6 through 1 HP) are single-phase only.
+            {'\n\n'}
+            Please select 120V 1Φ or 240V 1Φ, or choose an integral HP motor (1.5 HP or larger) for three-phase.
+          </Text>
+        </View>
+      )}
+
       {/* Results - Unified Card */}
-      {result && (
+      {result && !showInvalidComboError && (
         <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {/* Motor Spec Header */}
           <View style={styles.resultHeader}>
@@ -296,4 +314,26 @@ const styles = StyleSheet.create({
   resultValue: { fontSize: FontSizes.md, marginBottom: Spacing.xs },
   reference: { fontSize: FontSizes.xs, marginTop: Spacing.md, fontStyle: 'italic' },
   warning: { fontSize: FontSizes.sm, marginTop: Spacing.xs },
+  errorCard: {
+    marginTop: Spacing.lg,
+    padding: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  errorIcon: {
+    fontSize: 48,
+    marginBottom: Spacing.md,
+  },
+  errorTitle: {
+    fontSize: FontSizes.lg,
+    fontWeight: '700',
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
+  },
+  errorMessage: {
+    fontSize: FontSizes.sm,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
 });
