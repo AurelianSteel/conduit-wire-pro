@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, ScrollView, Switch, StyleSheet } from 'react-native';
 import { useTheme } from '../../src/hooks/useTheme';
 import { calculateMotorCircuit } from '../../src/services/motorCircuitService';
 import { MotorHP, MotorVoltage } from '../../src/data/motor-fla-data';
 import { ConductorMaterial } from '../../src/types/motor';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
-const MotorCircuitScreen: React.FC = () => {
+export default function MotorCircuitScreen() {
   const { colors } = useTheme();
+  
   const [hp, setHP] = useState<MotorHP>('5');
   const [voltage, setVoltage] = useState<MotorVoltage>('240V-3ph');
   const [material, setMaterial] = useState<ConductorMaterial>('copper');
@@ -29,198 +29,252 @@ const MotorCircuitScreen: React.FC = () => {
     }
   }, [hp, voltage, material, terminalRating, continuousLoad]);
 
-  const theme = useTheme();
+  const hpOptions: MotorHP[] = ['1/6', '1/4', '1/3', '1/2', '3/4', '1', '1.5', '2', '3', '5', '7.5', '10', '15', '20', '25', '30', '40', '50', '60', '75', '100', '125', '150', '200'];
+  
+  const voltageOptions: { value: MotorVoltage; label: string }[] = [
+    { value: '120V-1ph', label: '120V 1Φ' },
+    { value: '240V-1ph', label: '240V 1Φ' },
+    { value: '208V-3ph', label: '208V 3Φ' },
+    { value: '240V-3ph', label: '240V 3Φ' },
+    { value: '480V-3ph', label: '480V 3Φ' },
+  ];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       {/* HP Selector */}
-      <View style={[styles.gridContainer, styles.marginBottom]}>
-        {['1/6', '1/4', '1/3', '1/2', '3/4', '1', '1.5', '2', '3', '5', '7.5', '10', '15', '20', '25', '30', '40', '50'].map((option) => (
+      <Text style={[styles.label, { color: colors.textSecondary }]}>MOTOR HORSEPOWER</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+        {hpOptions.map((option) => (
           <TouchableOpacity
             key={option}
             style={[
-              styles.gridButton,
-              hp === option && { backgroundColor: colors.primary },
+              styles.hpButton,
+              { borderColor: colors.border },
+              hp === option && { backgroundColor: colors.success, borderColor: colors.success },
             ]}
-            onPress={() => setHP(option as MotorHP)}
+            onPress={() => setHP(option)}
           >
-            <Text style={[styles.gridButtonText, hp === option && { color: colors.text }]}>{option} HP</Text>
+            <Text style={[styles.hpButtonText, { color: hp === option ? '#fff' : colors.textSecondary }]}>
+              {option}
+            </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       {/* Voltage Selector */}
-      <View style={[styles.gridContainer, styles.marginBottom]}>
-        {['120V 1Φ', '240V 1Φ', '208V 3Φ', '240V 3Φ', '480V 3Φ'].map((option) => (
+      <Text style={[styles.label, { color: colors.textSecondary }]}>VOLTAGE</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+        {voltageOptions.map((v) => (
           <TouchableOpacity
-            key={option}
+            key={v.value}
             style={[
-              styles.gridButton,
-              voltage === option && { backgroundColor: colors.primary },
+              styles.voltageButton,
+              { borderColor: colors.border },
+              voltage === v.value && { backgroundColor: colors.primary, borderColor: colors.primary },
             ]}
-            onPress={() => setVoltage(option as MotorVoltage)}
+            onPress={() => setVoltage(v.value)}
           >
-            <Text style={[styles.gridButtonText, voltage === option && { color: colors.text }]}>{option}</Text>
+            <Text style={[styles.voltageButtonText, { color: voltage === v.value ? '#fff' : colors.textSecondary }]}>
+              {v.label}
+            </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
-      {/* Material Selector */}
-      <View style={[styles.gridContainer, styles.marginBottom]}>
-        {['Copper', 'Aluminum'].map((option) => (
-          <TouchableOpacity
-            key={option}
-            style={[
-              styles.gridButton,
-              material === option.toLowerCase() && { backgroundColor: colors.primary },
-            ]}
-            onPress={() => setMaterial(option.toLowerCase() as ConductorMaterial)}
-          >
-            <Text style={[styles.gridButtonText, material === option.toLowerCase() && { color: colors.text }]}>{option}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Terminal Rating Selector */}
-      <View style={[styles.gridContainer, styles.marginBottom]}>
-        {([60, 75, 90] as const).map((option) => (
-          <TouchableOpacity
-            key={option}
-            style={[
-              styles.gridButton,
-              terminalRating === option && { backgroundColor: colors.primary },
-            ]}
-            onPress={() => setTerminalRating(option)}
-          >
-            <Text style={[styles.gridButtonText, terminalRating === option && { color: colors.text }]}>{option}°C</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Continuous Load Switch */}
-      <View style={styles.switchContainer}>
-        <Text style={styles.switchLabel}>Continuous Load:</Text>
+      {/* Material Toggle */}
+      <Text style={[styles.label, { color: colors.textSecondary }]}>CONDUCTOR MATERIAL</Text>
+      <View style={styles.toggleRow}>
         <TouchableOpacity
-          onPress={() => setContinuousLoad(!continuousLoad)}
           style={[
-            styles.switch,
-            continuousLoad && { backgroundColor: colors.primary },
+            styles.toggleBtn,
+            { borderColor: colors.border },
+            material === 'copper' && { backgroundColor: colors.success, borderColor: colors.success },
           ]}
+          onPress={() => setMaterial('copper')}
         >
-          <Ionicons name={continuousLoad ? 'toggle' : 'toggle-outline'} size={24} color={colors.text} />
+          <Text style={[styles.toggleText, { color: material === 'copper' ? '#fff' : colors.textSecondary }]}>
+            Copper
+          </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.toggleBtn,
+            { borderColor: colors.border },
+            material === 'aluminum' && { backgroundColor: colors.success, borderColor: colors.success },
+          ]}
+          onPress={() => setMaterial('aluminum')}
+        >
+          <Text style={[styles.toggleText, { color: material === 'aluminum' ? '#fff' : colors.textSecondary }]}>
+            Aluminum
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Terminal Rating */}
+      <Text style={[styles.label, { color: colors.textSecondary }]}>TERMINAL RATING</Text>
+      <View style={styles.toggleRow}>
+        {([60, 75, 90] as const).map((temp) => (
+          <TouchableOpacity
+            key={temp}
+            style={[
+              styles.terminalBtn,
+              { borderColor: colors.border },
+              terminalRating === temp && { backgroundColor: colors.secondary, borderColor: colors.secondary },
+            ]}
+            onPress={() => setTerminalRating(temp)}
+          >
+            <Text style={[styles.toggleText, { color: terminalRating === temp ? '#fff' : colors.textSecondary }]}>
+              {temp}°C
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Continuous Load */}
+      <View style={[styles.switchRow, { borderTopColor: colors.border }]}>
+        <Text style={[styles.label, { marginTop: 0, marginBottom: 0, color: colors.text }]}>
+          CONTINUOUS LOAD (3+ hours)
+        </Text>
+        <Switch
+          value={continuousLoad}
+          onValueChange={setContinuousLoad}
+          trackColor={{ false: colors.border, true: colors.success }}
+        />
       </View>
 
       {/* Results */}
       {result && (
-        <View style={[styles.resultContainer, styles.marginTop]}>
-          <Text style={styles.resultTitle}>Motor: {hp} HP @ {voltage}</Text>
-          <Text style={styles.resultValue}>Full-Load Amps: {result.fla}A</Text>
+        <View style={[styles.resultCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
+          <Text style={[styles.resultTitle, { color: colors.text }]}>
+            Motor: {hp} HP @ {voltageOptions.find(v => v.value === voltage)?.label}
+          </Text>
+          <Text style={[styles.resultSubtitle, { color: colors.textSecondary }]}>
+            Full-Load Amps: {result.fla}A
+          </Text>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <Text style={styles.resultSubtitle}>CONDUCTOR SIZING (NEC 430.22)</Text>
-          <Text style={styles.resultValue}>Min Ampacity: {result.minConductorAmpacity}A</Text>
-          <Text style={styles.resultValue}>Recommended: {result.recommendedConductorSize} {material}</Text>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CONDUCTOR SIZING (NEC 430.22)</Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Min Ampacity: {result.minConductorAmpacity}A
+          </Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Recommended: {result.recommendedConductorSize} {material}
+          </Text>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <Text style={styles.resultSubtitle}>OCPD (NEC 430.52)</Text>
-          <Text style={styles.resultValue}>{result.recommendedOCPD}</Text>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>OCPD (NEC 430.52)</Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>{result.recommendedOCPD}</Text>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <Text style={styles.resultSubtitle}>DISCONNECT (NEC 430.110)</Text>
-          <Text style={styles.resultValue}>Minimum Rating: {result.minDisconnectRating}A</Text>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>DISCONNECT (NEC 430.110)</Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Minimum Rating: {result.minDisconnectRating}A
+          </Text>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <Text style={styles.resultSubtitle}>OVERLOAD (NEC 430.32)</Text>
-          <Text style={styles.resultValue}>Range: {result.overloadMin}A - {result.overloadMax}A</Text>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>OVERLOAD (NEC 430.32)</Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Range: {result.overloadMin}A - {result.overloadMax}A
+          </Text>
 
-          <View style={styles.divider} />
+          <Text style={[styles.reference, { color: colors.textTertiary }]}>
+            Reference: NEC 2023 Article {result.necArticle}
+          </Text>
 
-          <Text style={styles.resultSubtitle}>Reference: NEC 2023 Article {result.necArticle}</Text>
+          {result.warnings.length > 0 && (
+            <View style={{ marginTop: Spacing.md }}>
+              {result.warnings.map((warning, i) => (
+                <Text key={i} style={[styles.warning, { color: colors.warning }]}>
+                  {warning}
+                </Text>
+              ))}
+            </View>
+          )}
         </View>
       )}
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: Spacing.lg,
-    // backgroundColor via inline style
-  },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  gridButton: {
-    width: '48%',
-    aspectRatio: 1.5,
-    marginVertical: Spacing.sm / 2,
-    // backgroundColor via inline style
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: BorderRadius.md,
-  },
-  gridButtonText: {
-    fontSize: FontSizes.md,
-    // color via inline style
-  },
-  marginBottom: {
-    marginBottom: Spacing.lg,
-  },
-  marginTop: {
-    marginTop: Spacing.lg,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.lg,
-  },
-  switchLabel: {
-    fontSize: FontSizes.md,
-    // color via inline style
-  },
-  switch: {
-    width: 50,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // backgroundColor via inline style
-  },
-  resultContainer: {
-    padding: Spacing.md,
-    // backgroundColor via inline style
-    borderRadius: BorderRadius.lg,
-  },
-  resultTitle: {
-    fontSize: FontSizes.xl,
-    // color via inline style
-  },
-  resultSubtitle: {
-    fontSize: FontSizes.md,
-    fontWeight: 'bold',
-    marginTop: Spacing.sm,
-    // color via inline style
-  },
-  resultValue: {
-    fontSize: FontSizes.md,
-    marginVertical: Spacing.sm / 2,
-    // color via inline style
-  },
-  divider: {
-    height: 1,
-    // backgroundColor via inline style
+  container: { flex: 1, padding: Spacing.lg },
+  label: {
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
     marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+    letterSpacing: 0.5,
+  },
+  hpButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  hpButtonText: { fontSize: FontSizes.sm, fontWeight: '600' },
+  voltageButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
+  voltageButtonText: { fontSize: FontSizes.sm, fontWeight: '600' },
+  toggleRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
     marginBottom: Spacing.md,
   },
+  toggleBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  terminalBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  toggleText: { fontSize: FontSizes.md, fontWeight: '600' },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: Spacing.md,
+    marginTop: Spacing.md,
+    borderTopWidth: 1,
+    marginBottom: Spacing.lg,
+  },
+  resultCard: {
+    marginTop: Spacing.lg,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+  },
+  resultTitle: { fontSize: FontSizes.lg, fontWeight: '700' },
+  resultSubtitle: { fontSize: FontSizes.md, marginTop: Spacing.xs },
+  divider: {
+    height: 1,
+    marginVertical: Spacing.md,
+  },
+  sectionLabel: {
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
+    marginBottom: Spacing.xs,
+    letterSpacing: 0.5,
+  },
+  resultValue: { fontSize: FontSizes.md, marginBottom: Spacing.xs },
+  reference: { fontSize: FontSizes.xs, marginTop: Spacing.md, fontStyle: 'italic' },
+  warning: { fontSize: FontSizes.sm, marginTop: Spacing.xs },
 });
-
-export default MotorCircuitScreen;
