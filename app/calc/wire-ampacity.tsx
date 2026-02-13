@@ -7,7 +7,7 @@ import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
 export default function WireAmpacityScreen() {
   const { colors } = useTheme();
-  const accentColor = '#8b5cf6'; // Purple - matches Motor Circuit
+  const accentColor = '#f59e0b'; // Amber - matches home screen icon
   
   const [wireSize, setWireSize] = useState<WireSize>('12');
   const [insulationType, setInsulationType] = useState<InsulationType>('THHN/THWN-2');
