@@ -1,12 +1,6 @@
 import { getMotorFLA, MotorHP, MotorVoltage } from '../data/motor-fla-data';
 import { MotorCircuitInput, MotorCircuitResult } from '../types/motor';
-
-// Simplified conductor sizing table (AWG only, copper at 75°C)
-const conductorAmpacityTable: Record<string, number> = {
-  '14': 20, '12': 25, '10': 35, '8': 50, '6': 65, '4': 85, '3': 100, '2': 115,
-  '1': 130, '1/0': 150, '2/0': 175, '3/0': 200, '4/0': 230,
-  '250': 255, '300': 285, '350': 310, '400': 335, '500': 380,
-};
+import { findConductorSize } from '../data/motor-conductor-data';
 
 export function calculateMotorCircuit(input: MotorCircuitInput): MotorCircuitResult {
   const { hp, voltage, conductorMaterial, terminalRating, continuousLoad } = input;
@@ -21,12 +15,15 @@ export function calculateMotorCircuit(input: MotorCircuitInput): MotorCircuitRes
   // Minimum ampacity = 125% of FLA
   const minConductorAmpacity = Math.ceil(fla * 1.25);
   
-  // Find conductor size that meets ampacity (sorted by ampacity)
-  const sortedSizes = Object.entries(conductorAmpacityTable)
-    .sort((a, b) => a[1] - b[1]);
-  const recommendedConductorSize = sortedSizes.find(
-    ([_, ampacity]) => ampacity >= minConductorAmpacity
-  )?.[0] || '500+';
+  // Find conductor size based on material and terminal rating
+  const material = conductorMaterial === 'copper' ? 'copper' : 'aluminum';
+  const conductorSize = findConductorSize(minConductorAmpacity, material, terminalRating);
+  
+  if (!conductorSize) {
+    throw new Error(`No conductor size available for ${minConductorAmpacity}A`);
+  }
+  
+  const recommendedConductorSize = conductorSize;
   
   // Step 3: OCPD sizing (NEC 430.52)
   // Inverse time breaker: 250% of FLA (max)

@@ -168,7 +168,7 @@ export default function MotorCircuitScreen() {
             Min Ampacity: {result.minConductorAmpacity}A
           </Text>
           <Text style={[styles.resultValue, { color: colors.text }]}>
-            Recommended: {result.recommendedConductorSize} {material}
+            Recommended: #{result.recommendedConductorSize} AWG {material}
           </Text>
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
