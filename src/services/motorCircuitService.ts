@@ -21,10 +21,12 @@ export function calculateMotorCircuit(input: MotorCircuitInput): MotorCircuitRes
   // Minimum ampacity = 125% of FLA
   const minConductorAmpacity = Math.ceil(fla * 1.25);
   
-  // Find conductor size that meets ampacity
-  const recommendedConductorSize = Object.keys(conductorAmpacityTable).find(
-    (size) => conductorAmpacityTable[size] >= minConductorAmpacity
-  ) || '500+';
+  // Find conductor size that meets ampacity (sorted by ampacity)
+  const sortedSizes = Object.entries(conductorAmpacityTable)
+    .sort((a, b) => a[1] - b[1]);
+  const recommendedConductorSize = sortedSizes.find(
+    ([_, ampacity]) => ampacity >= minConductorAmpacity
+  )?.[0] || '500+';
   
   // Step 3: OCPD sizing (NEC 430.52)
   // Inverse time breaker: 250% of FLA (max)
