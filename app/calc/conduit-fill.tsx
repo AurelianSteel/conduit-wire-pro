@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { useTheme } from '../../src/hooks/useTheme';
+import { useSettings } from '../../src/hooks/useSettings';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { ConduitType, conduitSizes } from '../../src/data/conduit-dimensions';
 import { WireInsulationType } from '../../src/data/wire-dimensions';
@@ -20,7 +21,16 @@ const INSULATION_GROUPS: { key: WireInsulationType; label: string }[] = [
 
 export default function ConduitFillScreen() {
   const { colors } = useTheme();
-  const [conduitType, setConduitType] = useState<ConduitType>('EMT');
+  const { settings } = useSettings();
+  
+  // Map settings conduit to actual ConduitType
+  const mapSettingsToConduitType = (setting: string): ConduitType => {
+    if (setting === 'PVC') return 'PVC-40';
+    if (setting === 'GRC') return 'RMC'; // GRC not in data, use RMC as fallback
+    return setting as ConduitType;
+  };
+  
+  const [conduitType, setConduitType] = useState<ConduitType>(mapSettingsToConduitType(settings.defaultConduit));
   const [tradeSize, setTradeSize] = useState('3/4');
   const [showTradeSizePicker, setShowTradeSizePicker] = useState(false);
   const [wireSize, setWireSize] = useState('12');
