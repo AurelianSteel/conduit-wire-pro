@@ -71,8 +71,10 @@ export default function HomeScreen() {
             <View style={[styles.iconContainer, { backgroundColor: calc.color + '20' }]}>
               <Ionicons name={calc.icon} size={32} color={calc.color} />
             </View>
-            <Text style={[styles.cardTitle, { color: colors.text }]}>{calc.title}</Text>
-            <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>{calc.subtitle}</Text>
+            <View style={styles.cardContent}>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{calc.title}</Text>
+              <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>{calc.subtitle}</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -100,6 +102,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'center',
   },
   cardTitle: { fontSize: 18, fontWeight: '700' },
   cardSubtitle: { fontSize: 14, marginTop: 2 },
