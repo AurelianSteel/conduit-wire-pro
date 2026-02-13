@@ -1,15 +1,14 @@
-// app/calc/wire-ampacity.tsx
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, ScrollView, Switch, StyleSheet } from 'react-native';
 import { useTheme } from '../../src/hooks/useTheme';
 import { calculateDeratedAmpacity } from '../../src/services/ampacityService';
 import { WireSize, InsulationType, ConductorCountRange, AmpacityInput } from '../../src/types/ampacity';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
-const WireAmpacityScreen: React.FC = () => {
-  const theme = useTheme();
-
+export default function WireAmpacityScreen() {
+  const { colors } = useTheme();
+  const accentColor = '#8b5cf6'; // Purple - matches Motor Circuit
+  
   const [wireSize, setWireSize] = useState<WireSize>('12');
   const [insulationType, setInsulationType] = useState<InsulationType>('THHN/THWN-2');
   const [ambientTempC, setAmbientTempC] = useState<number>(30);
@@ -27,7 +26,6 @@ const WireAmpacityScreen: React.FC = () => {
       };
       return calculateDeratedAmpacity(input);
     } catch (error) {
-      console.error('Calculation error:', error);
       return null;
     }
   }, [wireSize, insulationType, ambientTempC, conductorCountRange, continuousLoad]);
@@ -37,247 +35,251 @@ const WireAmpacityScreen: React.FC = () => {
   const ambientTemperatures: number[] = [30, 35, 40, 45, 50];
   const conductorCountRanges: ConductorCountRange[] = ['1-3', '4-6', '7-9', '10-20', '21-30', '31-40', '41+'];
 
-  const handleWireSizeSelect = (size: WireSize) => {
-    setWireSize(size);
-  };
-
-  const handleInsulationTypeSelect = (type: InsulationType) => {
-    setInsulationType(type);
-  };
-
-  const handleAmbientTempSelect = (temp: number) => {
-    setAmbientTempC(temp);
-  };
-
-  const handleConductorCountRangeSelect = (range: ConductorCountRange) => {
-    setConductorCountRange(range);
-  };
-
-  const toggleContinuousLoad = () => {
-    setContinuousLoad(!continuousLoad);
-  };
-
-  function celsiusToFahrenheit(c: number): number {
-    return Math.round((c * 9/5) + 32);
-  }
+  const celsiusToFahrenheit = (c: number): number => Math.round((c * 9/5) + 32);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={[styles.card, { backgroundColor: theme.colors.background }]}>
-        <Text style={styles.title}>Wire Ampacity Calculator</Text>
-        
-        {/* Wire Size Selector */}
-        <Text style={styles.sectionTitle}>Wire Size</Text>
-        <View style={styles.buttonGrid}>
-          {wireSizes.map(size => (
-            <TouchableOpacity
-              key={size}
-              style={[
-                styles.button,
-                wireSize === size && { backgroundColor: theme.colors.primary },
-              ]}
-              onPress={() => handleWireSizeSelect(size)}
-            >
-              <Text style={styles.buttonText}>{size}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Insulation Type Selector */}
-        <Text style={styles.sectionTitle}>Insulation Type</Text>
-        <View style={styles.buttonGrid}>
-          {insulationTypes.map(type => (
-            <TouchableOpacity
-              key={type}
-              style={[
-                styles.button,
-                insulationType === type && { backgroundColor: theme.colors.primary },
-              ]}
-              onPress={() => handleInsulationTypeSelect(type)}
-            >
-              <Text style={styles.buttonText}>{type}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Ambient Temperature Selector */}
-        <Text style={styles.sectionTitle}>Ambient Temperature (°C)</Text>
-        <View style={styles.buttonGrid}>
-          {ambientTemperatures.map(temp => (
-            <TouchableOpacity
-              key={temp}
-              style={[
-                styles.button,
-                ambientTempC === temp && { backgroundColor: theme.colors.primary },
-              ]}
-              onPress={() => handleAmbientTempSelect(temp)}
-            >
-              <Text style={styles.buttonText}>{`${temp}°C (${celsiusToFahrenheit(temp)}°F)`}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Conductor Count Selector */}
-        <Text style={styles.sectionTitle}>Conductor Count</Text>
-        <View style={styles.buttonGrid}>
-          {conductorCountRanges.map(range => (
-            <TouchableOpacity
-              key={range}
-              style={[
-                styles.button,
-                conductorCountRange === range && { backgroundColor: theme.colors.primary },
-              ]}
-              onPress={() => handleConductorCountRangeSelect(range)}
-            >
-              <Text style={styles.buttonText}>{range}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Continuous Load Toggle */}
-        <TouchableOpacity
-          style={[
-            styles.toggleButton,
-            continuousLoad && { backgroundColor: theme.colors.primary },
-          ]}
-          onPress={toggleContinuousLoad}
-        >
-          <Ionicons name="checkbox" size={24} color={continuousLoad ? theme.colors.background : theme.colors.text} />
-          <Text style={styles.toggleButtonText}>Continuous Load</Text>
-        </TouchableOpacity>
-
-        {/* Results Display */}
-        {result && (
-          <View style={[styles.resultsCard, { backgroundColor: theme.colors.surfaceElevated }]}>
-            <Text style={styles.resultTitle}>Results</Text>
-            <Text style={styles.resultText}>
-              Base Ampacity: {result.baseAmpacity}A ({insulationType})
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      {/* Wire Size Selector */}
+      <Text style={[styles.label, { color: colors.textSecondary }]}>WIRE SIZE (AWG)</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+        {wireSizes.map((size) => (
+          <TouchableOpacity
+            key={size}
+            style={[
+              styles.wireSizeButton,
+              { borderColor: colors.border },
+              wireSize === size && { backgroundColor: accentColor, borderColor: accentColor },
+            ]}
+            onPress={() => setWireSize(size)}
+          >
+            <Text style={[styles.wireSizeButtonText, { color: wireSize === size ? '#fff' : colors.textSecondary }]}>
+              {size}
             </Text>
-            <Text style={styles.resultSubtitle}>Derating Factors:</Text>
-            <Text style={styles.resultDetail}>
-              Temperature ({ambientTempC}°C): × {result.temperatureCorrectionFactor.toFixed(2)}
-            </Text>
-            <Text style={styles.resultDetail}>
-              Conductor Count ({conductorCountRange}): × {result.adjustmentFactor.toFixed(2)}
-            </Text>
-            <Text style={styles.resultDetail}>
-              Continuous Load: × {result.continuousFactor.toFixed(2)}
-            </Text>
-            <View style={styles.divider} />
-            <Text style={styles.resultTitle}>Final Derated Ampacity: {result.deratedAmpacity}A</Text>
-            <Text style={styles.resultDetail}>Reference: NEC 2023 Article {result.necArticle}</Text>
-          </View>
-        )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
-        {/* Warnings */}
-        {result?.warnings && (
-          result.warnings.map((warning, index) => (
-            <View key={index} style={[styles.warningBox, { backgroundColor: theme.colors.warning }]}>
-              <Text style={styles.warningText}>{warning}</Text>
-            </View>
-          ))
-        )}
+      {/* Insulation Type */}
+      <Text style={[styles.label, { color: colors.textSecondary }]}>INSULATION TYPE</Text>
+      <View style={styles.toggleRow}>
+        {insulationTypes.map((type) => (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.toggleBtn,
+              { borderColor: colors.border },
+              insulationType === type && { backgroundColor: accentColor, borderColor: accentColor },
+            ]}
+            onPress={() => setInsulationType(type)}
+          >
+            <Text style={[styles.toggleText, { color: insulationType === type ? '#fff' : colors.textSecondary }]}>
+              {type}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
+
+      {/* Ambient Temperature */}
+      <Text style={[styles.label, { color: colors.textSecondary }]}>AMBIENT TEMPERATURE</Text>
+      <View style={styles.toggleRow}>
+        {ambientTemperatures.map((temp) => (
+          <TouchableOpacity
+            key={temp}
+            style={[
+              styles.tempBtn,
+              { borderColor: colors.border },
+              ambientTempC === temp && { backgroundColor: accentColor, borderColor: accentColor },
+            ]}
+            onPress={() => setAmbientTempC(temp)}
+          >
+            <Text style={[styles.toggleText, { color: ambientTempC === temp ? '#fff' : colors.textSecondary }]}>
+              {temp}°C
+            </Text>
+            <Text style={[styles.tempSubtext, { color: ambientTempC === temp ? '#fff' : colors.textTertiary }]}>
+              {celsiusToFahrenheit(temp)}°F
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Conductor Count */}
+      <Text style={[styles.label, { color: colors.textSecondary }]}>CONDUCTORS IN RACEWAY</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+        {conductorCountRanges.map((range) => (
+          <TouchableOpacity
+            key={range}
+            style={[
+              styles.conductorBtn,
+              { borderColor: colors.border },
+              conductorCountRange === range && { backgroundColor: accentColor, borderColor: accentColor },
+            ]}
+            onPress={() => setConductorCountRange(range)}
+          >
+            <Text style={[styles.toggleText, { color: conductorCountRange === range ? '#fff' : colors.textSecondary }]}>
+              {range}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Continuous Load */}
+      <View style={[styles.switchRow, { borderTopColor: colors.border }]}>
+        <Text style={[styles.switchLabel, { color: colors.text }]}>
+          CONTINUOUS LOAD (3+ hours)
+        </Text>
+        <Switch
+          value={continuousLoad}
+          onValueChange={setContinuousLoad}
+          trackColor={{ false: colors.border, true: colors.success }}
+          thumbColor="#fff"
+        />
+      </View>
+
+      {/* Results - Unified Card */}
+      {result && (
+        <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {/* Header */}
+          <View style={styles.resultHeader}>
+            <Text style={[styles.resultLabel, { color: colors.textSecondary }]}>
+              WIRE AMPACITY
+            </Text>
+            <Text style={[styles.resultWireSize, { color: accentColor }]}>
+              #{wireSize} AWG {insulationType}
+            </Text>
+            <Text style={[styles.resultBaseAmpacity, { color: colors.text }]}>
+              Base Ampacity: {result.baseAmpacity}A
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          {/* Derating Factors */}
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>DERATING FACTORS (NEC 310.15)</Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Temperature ({ambientTempC}°C): × {result.temperatureCorrectionFactor.toFixed(2)}
+          </Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Conductor Count ({conductorCountRange}): × {result.adjustmentFactor.toFixed(2)}
+          </Text>
+          <Text style={[styles.resultValue, { color: colors.text }]}>
+            Continuous Load: × {result.continuousFactor.toFixed(2)}
+          </Text>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          {/* Final Result */}
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>FINAL AMPACITY</Text>
+          <Text style={[styles.finalAmpacity, { color: accentColor }]}>
+            {result.deratedAmpacity}A
+          </Text>
+
+          <Text style={[styles.reference, { color: colors.textTertiary }]}>
+            Reference: NEC 2023 Article {result.necArticle}
+          </Text>
+
+          {result.warnings.length > 0 && (
+            <View style={{ marginTop: Spacing.md }}>
+              {result.warnings.map((warning, i) => (
+                <Text key={i} style={[styles.warning, { color: colors.warning }]}>
+                  {warning}
+                </Text>
+              ))}
+            </View>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: Spacing.md,
-    backgroundColor: '#fff',
-  },
-  card: {
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    marginVertical: Spacing.sm,
-  },
-  title: {
-    fontSize: FontSizes.title,
-    fontWeight: 'bold',
-    marginBottom: Spacing.md,
-    color: '#333',
-  },
-  sectionTitle: {
-    fontSize: FontSizes.lg,
-    fontWeight: 'bold',
+  container: { flex: 1, padding: Spacing.lg },
+  label: {
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
-    color: '#666',
+    letterSpacing: 0.5,
   },
-  buttonGrid: {
+  wireSizeButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  wireSizeButtonText: { fontSize: FontSizes.sm, fontWeight: '600' },
+  toggleRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  button: {
-    width: '45%',
-    aspectRatio: 1,
-    marginHorizontal: '2.5%',
+    gap: Spacing.sm,
     marginBottom: Spacing.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#eee',
+  },
+  toggleBtn: {
+    flex: 1,
+    minWidth: '45%',
+    paddingVertical: 12,
     borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    alignItems: 'center',
   },
-  buttonText: {
-    fontSize: FontSizes.md,
-    color: '#333',
+  tempBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    alignItems: 'center',
   },
-  toggleButton: {
+  conductorBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
+  toggleText: { fontSize: FontSizes.sm, fontWeight: '600' },
+  tempSubtext: { fontSize: FontSizes.xs, marginTop: 2 },
+  switchRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    backgroundColor: '#eee',
-    borderRadius: BorderRadius.md,
-    marginVertical: Spacing.md,
-  },
-  toggleButtonText: {
-    fontSize: FontSizes.md,
-    marginLeft: Spacing.sm,
-    color: '#333',
-  },
-  resultsCard: {
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.md,
+    paddingTop: Spacing.md,
     marginTop: Spacing.md,
+    borderTopWidth: 1,
+    marginBottom: Spacing.lg,
   },
-  resultTitle: {
-    fontSize: FontSizes.lg,
-    fontWeight: 'bold',
-    marginBottom: Spacing.sm,
-    color: '#333',
+  switchLabel: {
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
-  resultSubtitle: {
-    fontSize: FontSizes.md,
-    marginVertical: Spacing.sm,
-    color: '#666',
+  resultCard: {
+    marginTop: Spacing.lg,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
   },
-  resultText: {
-    fontSize: FontSizes.md,
-    marginBottom: Spacing.sm,
-    color: '#333',
+  resultHeader: {
+    alignItems: 'center',
+    paddingBottom: Spacing.md,
   },
-  resultDetail: {
-    fontSize: FontSizes.md,
-    marginBottom: Spacing.xs,
-    color: '#666',
-  },
+  resultLabel: { fontSize: FontSizes.xs, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
+  resultWireSize: { fontSize: FontSizes.xxl, fontWeight: '900', marginTop: Spacing.xs, textAlign: 'center' },
+  resultBaseAmpacity: { fontSize: FontSizes.md, marginTop: Spacing.xs, fontWeight: '600', textAlign: 'center' },
   divider: {
     height: 1,
-    backgroundColor: '#ccc',
     marginVertical: Spacing.md,
   },
-  warningBox: {
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    marginTop: Spacing.md,
+  sectionLabel: {
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
+    marginBottom: Spacing.xs,
+    letterSpacing: 0.5,
   },
-  warningText: {
-    fontSize: FontSizes.md,
-    color: '#333',
-  },
+  resultValue: { fontSize: FontSizes.md, marginBottom: Spacing.xs },
+  finalAmpacity: { fontSize: 32, fontWeight: '900', marginBottom: Spacing.xs },
+  reference: { fontSize: FontSizes.xs, marginTop: Spacing.md, fontStyle: 'italic' },
+  warning: { fontSize: FontSizes.sm, marginTop: Spacing.xs },
 });
-
-export default WireAmpacityScreen;
