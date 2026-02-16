@@ -1,0 +1,27 @@
+# Fastfile for Conduit & Wire Pro
+# Upload builds to App Store Connect
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Upload build to TestFlight"
+  lane :upload do |options|
+    ipa_path = options[:ipa] || "../ConduitWirePro.ipa"
+    
+    # Load API key from environment
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_filepath: ENV["APP_STORE_CONNECT_KEY_PATH"],
+      duration: 1200
+    )
+    
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: ipa_path,
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      notify_external_testers: false
+    )
+  end
+end

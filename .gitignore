@@ -2,3 +2,7 @@ node_modules/
 .expo/
 dist/
 *.tsbuildinfo
+# Fastlane credentials
+fastlane/AuthKey*.p8
+fastlane/.env
+fastlane/report.xml
