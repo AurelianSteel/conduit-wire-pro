@@ -50,6 +50,13 @@ export default function HomeScreen() {
       route: '/calc/motor-circuit',
       color: '#8b5cf6', // Purple
     },
+    {
+      title: 'Parallel Conductors',
+      subtitle: 'Size parallel wire runs',
+      icon: 'git-branch-outline',
+      route: '/calc/parallel-conductors',
+      color: '#ec4899', // Pink
+    },
   ];
 
   return (
@@ -57,7 +64,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Five essential calculators for electricians
+          Six essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>

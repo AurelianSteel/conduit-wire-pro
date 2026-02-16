@@ -64,5 +64,40 @@ describe('motorCircuitService', () => {
       
       expect(() => calculateMotorCircuit(input)).toThrow();
     });
+    
+    it('should apply additional 125% multiplier for continuous loads', () => {
+      const input: MotorCircuitInput = {
+        hp: '5',
+        voltage: '240V-3ph',
+        conductorMaterial: 'copper',
+        terminalRating: 75,
+        continuousLoad: true, // Continuous load flag
+      };
+      
+      const result = calculateMotorCircuit(input);
+      
+      // 6.6A FLA * 1.25 (430.22) = 8.25 → ceil = 9, then 9 * 1.25 = 11.25 → ceil = 12
+      expect(result.fla).toBe(6.6);
+      expect(result.minConductorAmpacity).toBe(12);
+      expect(result.recommendedConductorSize).toBe('14'); // 20A still sufficient
+    });
+    
+    it('should upsize conductor for larger continuous loads', () => {
+      const input: MotorCircuitInput = {
+        hp: '50',
+        voltage: '240V-3ph',
+        conductorMaterial: 'copper',
+        terminalRating: 75,
+        continuousLoad: true,
+      };
+      
+      const result = calculateMotorCircuit(input);
+      
+      // 56.8A FLA * 1.25 * 1.25 = 88.75A → ceil = 89A
+      // Requires #3 AWG (100A) instead of #4 AWG (85A)
+      expect(result.fla).toBe(56.8);
+      expect(result.minConductorAmpacity).toBe(89);
+      expect(result.recommendedConductorSize).toBe('3'); // Upsized from #4
+    });
   });
 });

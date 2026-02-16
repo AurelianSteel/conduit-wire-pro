@@ -13,7 +13,9 @@ export function calculateMotorCircuit(input: MotorCircuitInput): MotorCircuitRes
   
   // Step 2: Conductor sizing (NEC 430.22)
   // Minimum ampacity = 125% of FLA
-  const minConductorAmpacity = Math.ceil(fla * 1.25);
+  // For continuous loads (3+ hours), NEC 210.19(A)(1) requires additional 125% multiplier
+  const baseMinAmpacity = Math.ceil(fla * 1.25);
+  const minConductorAmpacity = continuousLoad ? Math.ceil(baseMinAmpacity * 1.25) : baseMinAmpacity;
   
   // Find conductor size based on material and terminal rating
   const material = conductorMaterial === 'copper' ? 'copper' : 'aluminum';
