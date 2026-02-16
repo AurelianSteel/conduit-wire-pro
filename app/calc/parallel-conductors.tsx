@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Switch, StyleSheet, TextInput } from 'react-native';
 import { useTheme } from '../../src/hooks/useTheme';
 import { calculateParallelConductors, recommendParallelRuns } from '../../src/services/parallelConductorService';
-import { ConductorSize } from '../../src/data/motor-conductor-data';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
 export default function ParallelConductorsScreen() {

@@ -28,6 +28,8 @@ export interface ParallelConductorResult {
   neutralSize?: ConductorSize;      // Neutral conductor size if applicable
   parallelSets: number;             // Number of parallel sets
   conductorsPerPhase: number;       // Conductors per phase (1 per run per phase)
+  conductorMaterial: 'copper' | 'aluminum';  // Material for display
+  terminalRating: 60 | 75 | 90;   // Terminal rating for display
   necArticle: string;               // NEC reference
   warnings: string[];
   wireSpecs: {
@@ -158,6 +160,8 @@ export function calculateParallelConductors(input: ParallelConductorInput): Para
     neutralSize,
     parallelSets: numRuns,
     conductorsPerPhase: numRuns,
+    conductorMaterial,
+    terminalRating,
     necArticle: '310.10(G)',
     warnings,
     wireSpecs,

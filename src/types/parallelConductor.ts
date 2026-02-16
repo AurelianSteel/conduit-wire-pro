@@ -33,6 +33,10 @@ export interface ParallelConductorResult {
   totalConductors: number; // Total number of conductors (including parallel runs)
   installationConsiderations: string[];
   
+  // Display properties (from service)
+  conductorMaterial: ConductorMaterial;
+  terminalRating: TerminalRating;
+  
   necArticle: string;
   warnings: string[];
 }
