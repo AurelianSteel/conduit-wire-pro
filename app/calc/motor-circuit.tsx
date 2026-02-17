@@ -46,10 +46,15 @@ export default function MotorCircuitScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+      keyboardShouldPersistTaps="handled"
+      bounces={true}
+    >
       {/* HP Selector */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>MOTOR HORSEPOWER</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }} scrollEnabled={true}>
         {hpOptions.map((option) => (
           <TouchableOpacity
             key={option}
@@ -69,7 +74,7 @@ export default function MotorCircuitScreen() {
 
       {/* Voltage Selector */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>VOLTAGE</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }} scrollEnabled={true}>
         {voltageOptions.map((v) => (
           <TouchableOpacity
             key={v.value}

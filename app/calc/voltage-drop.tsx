@@ -82,12 +82,13 @@ export default function VoltageDropScreen() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={{ flexGrow: 1, padding: Spacing.lg, paddingBottom: 100 }}
       keyboardShouldPersistTaps="handled"
+      bounces={true}
     >
       {/* System Voltage */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>SYSTEM VOLTAGE</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} scrollEnabled={true}>
         {systemVoltages.map((v, idx) => (
           <TouchableOpacity
             key={`${v.value}-${v.phase}-${idx}`}

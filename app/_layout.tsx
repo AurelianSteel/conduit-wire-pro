@@ -26,6 +26,8 @@ function AppContent() {
         <Stack.Screen name="calc/voltage-drop" options={{ title: 'Voltage Drop', headerBackTitle: 'Back', presentation: 'card' }} />
         <Stack.Screen name="calc/wire-ampacity" options={{ title: 'Wire Ampacity', headerBackTitle: 'Back', presentation: 'card' }} />
         <Stack.Screen name="calc/motor-circuit" options={{ title: 'Motor Circuit', headerBackTitle: 'Back', presentation: 'card' }} />
+        <Stack.Screen name="calc/parallel-conductors" options={{ title: 'Parallel Conductors', headerBackTitle: 'Back', presentation: 'card' }} />
+        <Stack.Screen name="calc/grounding-bonding" options={{ title: 'Grounding & Bonding', headerBackTitle: 'Back', presentation: 'card' }} />
       </Stack>
     </HistoryContext.Provider>
   );

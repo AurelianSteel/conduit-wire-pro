@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
@@ -57,14 +57,25 @@ export default function HomeScreen() {
       route: '/calc/parallel-conductors',
       color: '#ec4899', // Pink
     },
+    {
+      title: 'Grounding & Bonding',
+      subtitle: 'EGC, GEC, MBJ sizing',
+      icon: 'earth-outline',
+      route: '/calc/grounding-bonding',
+      color: '#22c55e', // Green
+    },
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+      bounces={true}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Six essential calculators for electricians
+          Seven essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>
@@ -85,7 +96,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

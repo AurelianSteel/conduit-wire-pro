@@ -6,7 +6,7 @@ import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
 export default function ParallelConductorsScreen() {
   const { colors } = useTheme();
-  const accentColor = '#f59e0b'; // Amber color for parallel conductors
+  const accentColor = '#ec4899'; // Pink color for parallel conductors (matches Home Screen)
 
   const [totalAmpacity, setTotalAmpacity] = useState<string>('400');
   const [numRuns, setNumRuns] = useState<number>(2);
@@ -45,7 +45,12 @@ export default function ParallelConductorsScreen() {
   const runOptions = [2, 3, 4, 5, 6];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+      keyboardShouldPersistTaps="handled"
+      bounces={true}
+    >
       {/* Ampacity Input */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>REQUIRED TOTAL AMPACITY (A)</Text>
       <TextInput

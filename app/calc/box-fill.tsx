@@ -6,9 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Switch,
+  Modal,
 } from 'react-native';
 import { useTheme } from '../../src/hooks/useTheme';
-import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
+import { Spacing, FontSizes } from '../../src/theme';
 import {
   BoxSize,
   ConductorEntry,
@@ -18,26 +19,39 @@ import { calculateBoxFill } from '../../src/engines/box-fill-engine';
 
 const WIRE_SIZES = [14, 12, 10, 8, 6];
 
+type ConductorEntryUI = {
+  id: string;
+  awg: number;
+  quantity: number;
+};
+
+const makeEntryId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
 export default function BoxFillScreen() {
   const { colors } = useTheme();
-  const [wireSize, setWireSize] = useState(14);
-  const [wireCount, setWireCount] = useState(4);
+
+  const [conductorEntries, setConductorEntries] = useState<ConductorEntryUI[]>([
+    { id: makeEntryId(), awg: 14, quantity: 4 },
+  ]);
   const [deviceYokes, setDeviceYokes] = useState(1);
   const [hasClamps, setHasClamps] = useState(true);
   const [hasGrounds, setHasGrounds] = useState(true);
 
-  // Build a dummy "large enough" box so the engine calculates total volume
+  const [showAddConductorsModal, setShowAddConductorsModal] = useState(false);
+  const [newWireSize, setNewWireSize] = useState(14);
+  const [newWireCount, setNewWireCount] = useState(1);
+
   const dummyBox: BoxSize = useMemo(() => ({
     id: 'dummy',
     name: 'Calc',
     type: 'square',
-    dimensions: '',
     volumeIn3: 999,
   }), []);
 
-  const conductors: ConductorEntry[] = useMemo(() => [
-    { awg: wireSize, quantity: wireCount },
-  ], [wireSize, wireCount]);
+  const conductors: ConductorEntry[] = useMemo(
+    () => conductorEntries.map(({ awg, quantity }) => ({ awg, quantity })),
+    [conductorEntries],
+  );
 
   const calculation = useMemo(() => {
     return calculateBoxFill({
@@ -52,7 +66,6 @@ export default function BoxFillScreen() {
   const totalVolume = calculation.selectedResult.totalVolume;
   const breakdown = calculation.selectedResult.breakdown;
 
-  // Find boxes that fit
   const boxesThatFit = useMemo(() => {
     return ALL_BOXES
       .filter(b => b.volumeIn3 >= totalVolume)
@@ -61,19 +74,54 @@ export default function BoxFillScreen() {
 
   const minimumBox = boxesThatFit.length > 0 ? boxesThatFit[0] : null;
 
+  const totalConductors = conductorEntries.reduce((sum, entry) => sum + entry.quantity, 0);
+  const conductorSummary = conductorEntries
+    .map((entry) => `${entry.quantity} × #${entry.awg}`)
+    .join(', ');
+
   const adjustCount = (
     setter: React.Dispatch<React.SetStateAction<number>>,
     current: number,
     delta: number,
     min = 0,
-    max = 20,
+    max = 50,
   ) => {
     setter(Math.max(min, Math.min(max, current + delta)));
   };
 
-  // Breakdown rows
+  const adjustEntryCount = (id: string, delta: number) => {
+    setConductorEntries((prev) =>
+      prev.map((entry) =>
+        entry.id === id
+          ? { ...entry, quantity: Math.max(1, Math.min(50, entry.quantity + delta)) }
+          : entry,
+      ),
+    );
+  };
+
+  const removeEntry = (id: string) => {
+    setConductorEntries((prev) => prev.filter((entry) => entry.id !== id));
+  };
+
+  const addEntry = () => {
+    setConductorEntries((prev) => [
+      ...prev,
+      {
+        id: makeEntryId(),
+        awg: newWireSize,
+        quantity: Math.max(1, newWireCount),
+      },
+    ]);
+    setNewWireSize(14);
+    setNewWireCount(1);
+    setShowAddConductorsModal(false);
+  };
+
   const breakdownRows = [
-    { label: `#${wireSize} conductors`, value: breakdown.conductors.totalVolume },
+    ...breakdown.conductors.details.map((detail) => ({
+      label: `#${detail.awg} conductors (${detail.count})`,
+      value: detail.subtotal,
+    })),
     ...(hasClamps ? [{ label: 'Cable clamps (internal)', value: breakdown.clamps.volume }] : []),
     ...(deviceYokes > 0 ? [{ label: 'Device yokes', value: breakdown.deviceYokes.volume }] : []),
     ...(hasGrounds ? [{ label: 'Equipment grounds (all)', value: breakdown.grounds.volume }] : []),
@@ -83,48 +131,48 @@ export default function BoxFillScreen() {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+      bounces={true}
     >
-      {/* Conductor Size */}
-      <Text style={[styles.label, { color: colors.textSecondary }]}>CONDUCTOR SIZE</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow}>
-        {WIRE_SIZES.map((ws) => (
-          <TouchableOpacity
-            key={ws}
-            style={[
-              styles.chip,
-              { borderColor: colors.border },
-              wireSize === ws && { backgroundColor: '#FF8C42', borderColor: '#FF8C42' },
-            ]}
-            onPress={() => setWireSize(ws)}
-          >
-            <Text style={[styles.chipText, { color: wireSize === ws ? '#fff' : colors.textSecondary }]}>
-              #{ws}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <Text style={[styles.label, { color: colors.textSecondary }]}>CONDUCTORS</Text>
+      {conductorEntries.map((entry) => (
+        <View key={entry.id} style={[styles.entryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+          <View style={styles.entryTopRow}>
+            <View style={[styles.entryChip, { backgroundColor: '#FF8C4222' }]}>
+              <Text style={[styles.entryChipText, { color: '#FF8C42' }]}>#{entry.awg} AWG</Text>
+            </View>
+            <TouchableOpacity onPress={() => removeEntry(entry.id)} style={[styles.deleteBtn, { borderColor: colors.error }]}> 
+              <Text style={[styles.deleteBtnText, { color: colors.error }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* Number of Conductors */}
-      <Text style={[styles.label, { color: colors.textSecondary }]}>NUMBER OF CONDUCTORS</Text>
-      <View style={styles.counterRow}>
-        <TouchableOpacity
-          style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
-          onPress={() => adjustCount(setWireCount, wireCount, -1, 1)}
-        >
-          <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
-        </TouchableOpacity>
-        <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.counterValue, { color: colors.text }]}>{wireCount}</Text>
+          <View style={[styles.counterRow, { marginTop: Spacing.sm }]}> 
+            <TouchableOpacity
+              style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
+              onPress={() => adjustEntryCount(entry.id, -1)}
+            >
+              <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
+            </TouchableOpacity>
+            <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+              <Text style={[styles.counterValue, { color: colors.text }]}>{entry.quantity}</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
+              onPress={() => adjustEntryCount(entry.id, 1)}
+            >
+              <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>+</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <TouchableOpacity
-          style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
-          onPress={() => adjustCount(setWireCount, wireCount, 1)}
-        >
-          <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>+</Text>
-        </TouchableOpacity>
-      </View>
+      ))}
 
-      {/* Device Yokes */}
+      <TouchableOpacity
+        style={[styles.addBtn, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
+        onPress={() => setShowAddConductorsModal(true)}
+      >
+        <Text style={[styles.addBtnText, { color: '#FF8C42' }]}>+ Add Conductors</Text>
+      </TouchableOpacity>
+
       <Text style={[styles.label, { color: colors.textSecondary }]}>DEVICE YOKES (switches/receptacles)</Text>
       <View style={styles.counterRow}>
         <TouchableOpacity
@@ -133,7 +181,7 @@ export default function BoxFillScreen() {
         >
           <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
         </TouchableOpacity>
-        <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <Text style={[styles.counterValue, { color: colors.text }]}>{deviceYokes}</Text>
         </View>
         <TouchableOpacity
@@ -144,8 +192,7 @@ export default function BoxFillScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Toggles */}
-      <View style={[styles.toggleRow, { borderColor: colors.border }]}>
+      <View style={[styles.toggleRow, { borderColor: colors.border }]}> 
         <Text style={[styles.toggleLabel, { color: colors.text }]}>Internal Cable Clamps</Text>
         <Switch
           value={hasClamps}
@@ -153,7 +200,7 @@ export default function BoxFillScreen() {
           trackColor={{ true: '#FF8C42', false: colors.border }}
         />
       </View>
-      <View style={[styles.toggleRow, { borderColor: colors.border }]}>
+      <View style={[styles.toggleRow, { borderColor: colors.border }]}> 
         <Text style={[styles.toggleLabel, { color: colors.text }]}>Equipment Grounds</Text>
         <Switch
           value={hasGrounds}
@@ -162,17 +209,12 @@ export default function BoxFillScreen() {
         />
       </View>
 
-      {/* Result Card — Minimum Box */}
       <View style={[styles.resultCard, {
         backgroundColor: minimumBox ? colors.success + '15' : colors.error + '15',
         borderColor: minimumBox ? colors.success : colors.error,
-      }]}>
-        <Text style={[styles.resultLabel, { color: colors.textSecondary }]}>
-          MINIMUM BOX SIZE
-        </Text>
-        <Text style={[styles.resultValue, {
-          color: minimumBox ? colors.success : colors.error,
-        }]}>
+      }]}> 
+        <Text style={[styles.resultLabel, { color: colors.textSecondary }]}>MINIMUM BOX SIZE</Text>
+        <Text style={[styles.resultValue, { color: minimumBox ? colors.success : colors.error }]}> 
           {minimumBox ? minimumBox.name : 'No standard box'}
         </Text>
         {minimumBox && (
@@ -180,23 +222,28 @@ export default function BoxFillScreen() {
             {minimumBox.volumeIn3} cu in
           </Text>
         )}
-        <Text style={[styles.resultSubtext, { color: colors.textSecondary, marginTop: 4 }]}>
+        <Text style={[styles.resultSubtext, { color: colors.textSecondary, marginTop: 4 }]}> 
           Required volume: {totalVolume.toFixed(2)} in³
+        </Text>
+        <Text style={[styles.resultSubtext, { color: colors.textSecondary }]}> 
+          {totalConductors} conductors total
+        </Text>
+        <Text style={[styles.resultSubtext, { color: colors.textSecondary }]}> 
+          {conductorSummary || 'No conductors added'}
         </Text>
       </View>
 
-      {/* Volume Breakdown */}
-      <View style={[styles.breakdownCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <View style={[styles.breakdownCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
         <Text style={[styles.breakdownTitle, { color: colors.text }]}>Volume Breakdown</Text>
         {breakdownRows.map((row, idx) => (
-          <View key={idx} style={[styles.breakdownRow, { borderBottomColor: colors.border }]}>
+          <View key={idx} style={[styles.breakdownRow, { borderBottomColor: colors.border }]}> 
             <Text style={[styles.breakdownItem, { color: colors.textSecondary }]}>{row.label}</Text>
             <Text style={[styles.breakdownValue, { color: colors.text }]}>
               {row.value.toFixed(2)} in³
             </Text>
           </View>
         ))}
-        <View style={[styles.breakdownRow, { borderBottomWidth: 0 }]}>
+        <View style={[styles.breakdownRow, { borderBottomWidth: 0 }]}> 
           <Text style={[styles.breakdownItem, { color: '#FF8C42', fontWeight: '700' }]}>Total</Text>
           <Text style={[styles.breakdownValue, { color: '#FF8C42', fontWeight: '700' }]}>
             {totalVolume.toFixed(2)} in³
@@ -204,15 +251,10 @@ export default function BoxFillScreen() {
         </View>
       </View>
 
-      {/* Boxes That Fit */}
-      <View style={[styles.tableCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Text style={[styles.tableTitle, { color: colors.text }]}>
-          ✅ Boxes That Fit ({boxesThatFit.length})
-        </Text>
+      <View style={[styles.tableCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+        <Text style={[styles.tableTitle, { color: colors.text }]}>✅ Boxes That Fit ({boxesThatFit.length})</Text>
         {boxesThatFit.length === 0 ? (
-          <Text style={[styles.noBoxText, { color: colors.error }]}>
-            No standard box is large enough. Reduce conductors or use a larger box.
-          </Text>
+          <Text style={[styles.noBoxText, { color: colors.error }]}>No standard box is large enough. Reduce conductors or use a larger box.</Text>
         ) : (
           boxesThatFit.slice(0, 10).map((box, idx) => (
             <View
@@ -227,20 +269,77 @@ export default function BoxFillScreen() {
                 <Text style={[styles.boxName, { color: colors.text }]}>{box.name}</Text>
                 <Text style={[styles.boxDims, { color: colors.textSecondary }]}>{box.type}</Text>
               </View>
-              <Text style={[styles.boxVolume, { color: colors.success }]}>
-                {box.volumeIn3} in³
-              </Text>
+              <Text style={[styles.boxVolume, { color: colors.success }]}>{box.volumeIn3} in³</Text>
             </View>
           ))
         )}
       </View>
+
+      <Modal visible={showAddConductorsModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '72%' }]}> 
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Add Conductors</Text>
+
+            <Text style={[styles.label, { color: colors.textSecondary, marginTop: 0 }]}>WIRE SIZE</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} scrollEnabled={true}>
+              {WIRE_SIZES.map((ws) => (
+                <TouchableOpacity
+                  key={ws}
+                  style={[
+                    styles.chip,
+                    { borderColor: colors.border },
+                    newWireSize === ws && { backgroundColor: '#FF8C42', borderColor: '#FF8C42' },
+                  ]}
+                  onPress={() => setNewWireSize(ws)}
+                >
+                  <Text style={[styles.chipText, { color: newWireSize === ws ? '#fff' : colors.textSecondary }]}>#{ws}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <Text style={[styles.label, { color: colors.textSecondary }]}>QUANTITY</Text>
+            <View style={styles.counterRow}>
+              <TouchableOpacity
+                style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
+                onPress={() => setNewWireCount((count) => Math.max(1, count - 1))}
+              >
+                <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
+              </TouchableOpacity>
+              <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+                <Text style={[styles.counterValue, { color: colors.text }]}>{newWireCount}</Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
+                onPress={() => setNewWireCount((count) => Math.min(50, count + 1))}
+              >
+                <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>+</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.modalAction, { backgroundColor: '#FF8C42', opacity: newWireCount > 0 ? 1 : 0.5 }]}
+              onPress={addEntry}
+              disabled={newWireCount <= 0}
+            >
+              <Text style={styles.modalActionText}>Add</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.modalCancel, { backgroundColor: colors.surfaceElevated }]}
+              onPress={() => setShowAddConductorsModal(false)}
+            >
+              <Text style={{ color: '#FF8C42', fontWeight: '700', fontSize: FontSizes.md }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: Spacing.lg, paddingBottom: 40 },
+  content: { flexGrow: 1, padding: Spacing.lg, paddingBottom: 100 },
   label: {
     fontSize: FontSizes.xs,
     fontWeight: '700',
@@ -262,6 +361,50 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: FontSizes.sm,
     fontWeight: '600',
+  },
+  entryCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  entryTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  entryChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+  },
+  entryChipText: {
+    fontSize: FontSizes.sm,
+    fontWeight: '700',
+  },
+  deleteBtn: {
+    marginLeft: 'auto',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  addBtn: {
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+  },
+  addBtnText: {
+    fontSize: FontSizes.md,
+    fontWeight: '700',
   },
   counterRow: {
     flexDirection: 'row',
@@ -322,6 +465,7 @@ const styles = StyleSheet.create({
   },
   resultSubtext: {
     fontSize: FontSizes.sm,
+    textAlign: 'center',
   },
   breakdownCard: {
     marginTop: Spacing.lg,
@@ -382,5 +526,38 @@ const styles = StyleSheet.create({
   boxVolume: {
     fontSize: FontSizes.md,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+  },
+  modalTitle: {
+    fontSize: FontSizes.lg,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  modalAction: {
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalActionText: {
+    color: '#fff',
+    fontSize: FontSizes.md,
+    fontWeight: '700',
+  },
+  modalCancel: {
+    padding: Spacing.lg,
+    alignItems: 'center',
   },
 });

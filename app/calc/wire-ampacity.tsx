@@ -38,10 +38,15 @@ export default function WireAmpacityScreen() {
   const celsiusToFahrenheit = (c: number): number => Math.round((c * 9/5) + 32);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+      keyboardShouldPersistTaps="handled"
+      bounces={true}
+    >
       {/* Wire Size Selector */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>WIRE SIZE (AWG)</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }} scrollEnabled={true}>
         {wireSizes.map((size) => (
           <TouchableOpacity
             key={size}
@@ -104,7 +109,7 @@ export default function WireAmpacityScreen() {
 
       {/* Conductor Count */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>CONDUCTORS IN RACEWAY</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }} scrollEnabled={true}>
         {conductorCountRanges.map((range) => (
           <TouchableOpacity
             key={range}
