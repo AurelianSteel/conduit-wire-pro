@@ -64,6 +64,13 @@ export default function HomeScreen() {
       route: '/calc/grounding-bonding',
       color: '#22c55e', // Green
     },
+    {
+      title: 'Service/Feeder',
+      subtitle: 'Size dwelling services',
+      icon: 'home-outline',
+      route: '/calc/service-feeder',
+      color: '#06b6d4', // Cyan
+    },
   ];
 
   return (
@@ -75,7 +82,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Seven essential calculators for electricians
+          Eight essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>
