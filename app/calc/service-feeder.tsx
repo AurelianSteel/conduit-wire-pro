@@ -7,7 +7,7 @@ import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 
 export default function ServiceFeederScreen() {
   const { colors } = useTheme();
-  const accentColor = '#8b5cf6'; // Violet/purple for service/feeder
+  const accentColor = '#06b6d4'; // Cyan for service/feeder
 
   // Dwelling info
   const [squareFootage, setSquareFootage] = useState<string>('2000');
@@ -85,7 +85,7 @@ export default function ServiceFeederScreen() {
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: accentColor }]}>Service Feeder</Text>
         <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-          Dwelling load calculation per NEC 220.82
+          Dwelling load calculation
         </Text>
       </View>
 

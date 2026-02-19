@@ -69,7 +69,7 @@ export default function HomeScreen() {
       subtitle: 'Size dwelling services',
       icon: 'home-outline',
       route: '/calc/service-feeder',
-      color: '#8b5cf6', // Violet/Purple - matches calculator accent
+      color: '#06b6d4', // Cyan
     },
   ];
 
