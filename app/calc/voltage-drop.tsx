@@ -271,6 +271,7 @@ export default function VoltageDropScreen() {
             }
           </View>
 
+          <LegalDisclaimer />
         </View>
       )}
 
