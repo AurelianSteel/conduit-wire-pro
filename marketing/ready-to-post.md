@@ -11,7 +11,9 @@
 ✅ Wire Ampacity (with derating)
 ✅ Motor Branch Circuits
 
-NEC 2023 compliant. No subscriptions. No ads.
+Based on NEC 2023 standards. No subscriptions. No ads.
+
+⚠️ DISCLAIMER: For reference only. Always verify with a licensed electrician and local AHJ.
 
 Coming soon to iOS & Android 🔥
 
@@ -37,10 +39,12 @@ Conduit & Wire Pro — 5 NEC 2023 calculators in one app:
 • Motor Branch Circuits - Complete NEC 430 calculations
 
 What makes it different:
-✅ NEC 2023 compliant (not stuck on 2017)
+✅ Based on NEC 2023 standards (not stuck on 2017)
 ✅ Formula-based (not just table lookups)
 ✅ One-time purchase - No subscriptions ($4.99)
 ✅ No ads, no tracking - Built for the trade
+
+DISCLAIMER: This app provides reference calculations only. Always verify with a licensed electrician and your local Authority Having Jurisdiction (AHJ) before installation.
 
 I'm an inside wireman in LA, so I built this with real job site needs in mind.
 
@@ -105,9 +109,11 @@ Most electrical apps:
 
 Conduit & Wire Pro:
 ✅ One-time $4.99
-✅ NEC 2023
+✅ Based on NEC 2023 standards
 ✅ Modern UI
 ✅ 5 essential tools
+
+⚠️ For reference only. Verify with licensed electrician and local AHJ.
 
 Launching Feb 2026 🚀
 

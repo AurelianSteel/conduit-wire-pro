@@ -16,6 +16,7 @@ import {
   ALL_BOXES,
 } from '../../src/data/box-dimensions';
 import { calculateBoxFill } from '../../src/engines/box-fill-engine';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 const WIRE_SIZES = [14, 12, 10, 8, 6];
 
@@ -274,6 +275,8 @@ export default function BoxFillScreen() {
           ))
         )}
       </View>
+
+      <LegalDisclaimer />
 
       <Modal visible={showAddConductorsModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>

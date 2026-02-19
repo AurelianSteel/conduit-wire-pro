@@ -9,6 +9,7 @@ import {
   groundingBondingData,
 } from '../../src/services/groundingBondingService';
 import { ConductorSize, GroundingMaterial } from '../../src/types/groundingBonding';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 type ActiveTab = 'egc' | 'gec' | 'mbj';
 
@@ -153,6 +154,7 @@ export default function GroundingBondingScreen() {
       <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
         <Text style={[styles.resultLabel, { color: colors.textSecondary }]}>MINIMUM SIZE</Text>
         <Text style={[styles.resultValue, { color: accentColor }]}>{result.minimumSize}</Text>
+          <LegalDisclaimer />
         <Text style={[styles.resultReference, { color: colors.textSecondary }]}>NEC Reference: {result.necReference}</Text>
         <Text style={[styles.resultDetails, { color: colors.text }]}>{result.details}</Text>
       </View>

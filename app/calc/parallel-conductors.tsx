@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Switch, StyleSheet, TextInput
 import { useTheme } from '../../src/hooks/useTheme';
 import { calculateParallelConductors, recommendParallelRuns } from '../../src/services/parallelConductorService';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 export default function ParallelConductorsScreen() {
   const { colors } = useTheme();
@@ -278,6 +279,7 @@ export default function ParallelConductorsScreen() {
             • Minimum 1/0 AWG for parallel per NEC 310.10(G)
           </Text>
 
+          <LegalDisclaimer />
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
             Reference: NEC 2023 Article {result.necArticle}
           </Text>

@@ -4,6 +4,7 @@ import { useTheme } from '../../src/hooks/useTheme';
 import { calculateDeratedAmpacity } from '../../src/services/ampacityService';
 import { WireSize, InsulationType, ConductorCountRange, AmpacityInput } from '../../src/types/ampacity';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 export default function WireAmpacityScreen() {
   const { colors } = useTheme();
@@ -178,6 +179,7 @@ export default function WireAmpacityScreen() {
             {result.deratedAmpacity}A
           </Text>
 
+          <LegalDisclaimer />
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
             Reference: NEC 2023 Article {result.necArticle}
           </Text>

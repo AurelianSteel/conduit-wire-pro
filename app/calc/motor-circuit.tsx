@@ -5,6 +5,7 @@ import { calculateMotorCircuit } from '../../src/services/motorCircuitService';
 import { MotorHP, MotorVoltage } from '../../src/data/motor-fla-data';
 import { ConductorMaterial } from '../../src/types/motor';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 export default function MotorCircuitScreen() {
   const { colors } = useTheme();
@@ -213,6 +214,7 @@ export default function MotorCircuitScreen() {
             Range: {result.overloadMin}A - {result.overloadMax}A
           </Text>
 
+          <LegalDisclaimer />
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
             Reference: NEC 2023 Article {result.necArticle}
           </Text>

@@ -6,6 +6,7 @@ import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { ConduitType } from '../../src/data/conduit-dimensions';
 import { WireInsulationType } from '../../src/data/wire-dimensions';
 import { calculateConduitFill } from '../../src/engines/conduit-fill-engine';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 const CONDUIT_TYPES: ConduitType[] = ['EMT', 'IMC', 'RMC', 'PVC-40', 'PVC-80'];
 const TRADE_SIZES = ['1/2', '3/4', '1', '1-1/4', '1-1/2', '2', '2-1/2', '3', '3-1/2', '4'];
@@ -315,6 +316,8 @@ export default function ConduitFillScreen() {
           </Text>
         )}
       </View>
+
+      <LegalDisclaimer />
 
       <View style={[styles.tableCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
         <Text style={[styles.tableTitle, { color: colors.text }]}>Fill % by Conduit Size</Text>

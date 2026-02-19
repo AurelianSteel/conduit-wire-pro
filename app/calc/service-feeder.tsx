@@ -4,6 +4,7 @@ import { useTheme } from '../../src/hooks/useTheme';
 import { calculateServiceFeeder } from '../../src/services/serviceFeederService';
 import { ServiceFeederInput } from '../../src/types/serviceFeeder';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 export default function ServiceFeederScreen() {
   const { colors } = useTheme();
@@ -374,6 +375,7 @@ export default function ServiceFeederScreen() {
             </View>
           )}
 
+          <LegalDisclaimer />
           {/* NEC Reference */}
           <Text style={[styles.necRef, { color: colors.textTertiary }]}>
             Based on NEC Article {result.necArticle}

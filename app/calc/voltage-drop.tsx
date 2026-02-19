@@ -20,6 +20,7 @@ import {
 } from '../../src/engines/voltage-drop-engine';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { useHistory } from '../../src/hooks/useHistory';
+import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 export default function VoltageDropScreen() {
   const { colors } = useTheme();
