@@ -82,14 +82,6 @@ export default function ServiceFeederScreen() {
       keyboardShouldPersistTaps="handled"
       bounces={true}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: accentColor }]}>Service Feeder</Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-          Dwelling load calculation
-        </Text>
-      </View>
-
       {/* Dwelling Info Section */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: accentColor }]}>DWELLING INFO</Text>
@@ -398,19 +390,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: Spacing.md,
-  },
-  header: {
-    marginBottom: Spacing.lg,
-    paddingTop: Spacing.sm,
-  },
-  headerTitle: {
-    fontSize: FontSizes.xl,
-    fontWeight: '800',
-    marginBottom: Spacing.xs,
-  },
-  headerSubtitle: {
-    fontSize: FontSizes.sm,
-    fontWeight: '500',
   },
   section: {
     marginBottom: Spacing.lg,
