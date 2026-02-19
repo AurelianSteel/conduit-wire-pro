@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../hooks/useTheme';
-import { Spacing, FontSizes, BorderRadius } from './index';
+import { Spacing, FontSizes, BorderRadius } from '../theme';
 
 export function LegalDisclaimer() {
   const { colors } = useTheme();
