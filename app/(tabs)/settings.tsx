@@ -75,26 +75,6 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
         
-        <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            style={[styles.segmentButton, settings.units === 'imperial' && styles.segmentButtonActive]}
-            onPress={() => setUnits('imperial')}
-          >
-            <Text style={[
-              styles.segmentText, 
-              { color: settings.units === 'imperial' ? colors.primary : colors.textSecondary }
-            ]}>Imperial</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.segmentButton, settings.units === 'metric' && styles.segmentButtonActive]}
-            onPress={() => setUnits('metric')}
-          >
-            <Text style={[
-              styles.segmentText, 
-              { color: settings.units === 'metric' ? colors.primary : colors.textSecondary }
-            ]}>Metric</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       <View style={[styles.section, { marginTop: Spacing.lg }]}>
