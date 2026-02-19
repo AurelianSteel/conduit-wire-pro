@@ -28,6 +28,7 @@ function AppContent() {
         <Stack.Screen name="calc/motor-circuit" options={{ title: 'Motor Circuit', headerBackTitle: 'Back', presentation: 'card' }} />
         <Stack.Screen name="calc/parallel-conductors" options={{ title: 'Parallel Conductors', headerBackTitle: 'Back', presentation: 'card' }} />
         <Stack.Screen name="calc/grounding-bonding" options={{ title: 'Grounding & Bonding', headerBackTitle: 'Back', presentation: 'card' }} />
+        <Stack.Screen name="calc/service-feeder" options={{ title: 'Service Feeder', headerBackTitle: 'Back', presentation: 'card' }} />
       </Stack>
     </HistoryContext.Provider>
   );
