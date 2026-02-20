@@ -13,24 +13,25 @@ interface AmpacityTable {
 
 export const motorConductorAmpacity: Record<ConductorSize, AmpacityTable> = {
   '14': {
-    copper: { 60: 20, 75: 20, 90: 25 },
+    copper: { 60: 15, 75: 20, 90: 25 },
     aluminum: { 60: 0, 75: 0, 90: 0 }, // Not rated for aluminum
   },
   '12': {
-    copper: { 60: 25, 75: 25, 90: 30 },
-    aluminum: { 60: 20, 75: 20, 90: 25 },
+    copper: { 60: 20, 75: 25, 90: 30 },
+    aluminum: { 60: 15, 75: 20, 90: 25 },
   },
   '10': {
     copper: { 60: 30, 75: 35, 90: 40 },
     aluminum: { 60: 25, 75: 30, 90: 35 },
   },
+  // Note: 10* and 12* in NEC indicates 240.4(D) restrictions apply
   '8': {
     copper: { 60: 40, 75: 50, 90: 55 },
     aluminum: { 60: 30, 75: 40, 90: 45 },
   },
   '6': {
     copper: { 60: 55, 75: 65, 90: 75 },
-    aluminum: { 60: 40, 75: 50, 90: 60 },
+    aluminum: { 60: 40, 75: 50, 90: 55 },
   },
   '4': {
     copper: { 60: 70, 75: 85, 90: 95 },
@@ -45,7 +46,7 @@ export const motorConductorAmpacity: Record<ConductorSize, AmpacityTable> = {
     aluminum: { 60: 75, 75: 90, 90: 100 },
   },
   '1': {
-    copper: { 60: 110, 75: 130, 90: 150 },
+    copper: { 60: 110, 75: 130, 90: 145 },
     aluminum: { 60: 85, 75: 100, 90: 115 },
   },
   '1/0': {
@@ -70,7 +71,7 @@ export const motorConductorAmpacity: Record<ConductorSize, AmpacityTable> = {
   },
   '300': {
     copper: { 60: 240, 75: 285, 90: 320 },
-    aluminum: { 60: 190, 75: 230, 90: 255 },
+    aluminum: { 60: 195, 75: 230, 90: 260 },
   },
   '350': {
     copper: { 60: 260, 75: 310, 90: 350 },
