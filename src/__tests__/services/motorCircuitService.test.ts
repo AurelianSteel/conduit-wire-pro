@@ -65,39 +65,42 @@ describe('motorCircuitService', () => {
       expect(() => calculateMotorCircuit(input)).toThrow();
     });
     
-    it('should apply additional 125% multiplier for continuous loads', () => {
+    it('should use 125% multiplier per NEC 430.22 (not 156.25%)', () => {
       const input: MotorCircuitInput = {
         hp: '5',
         voltage: '240V-3ph',
         conductorMaterial: 'copper',
         terminalRating: 75,
-        continuousLoad: true, // Continuous load flag
+        continuousLoad: true, // Even with continuous load flag
       };
       
       const result = calculateMotorCircuit(input);
       
-      // 6.6A FLA * 1.25 (430.22) = 8.25 → ceil = 9, then 9 * 1.25 = 11.25 → ceil = 12
+      // NEC 430.22 requires 125% of FLA for motor branch circuits
+      // This already accounts for motor operation characteristics
+      // Do NOT apply additional 125% from NEC 210.19(A)(1)
+      // 6.6A FLA * 1.25 = 8.25 → ceil = 9A
       expect(result.fla).toBe(6.6);
-      expect(result.minConductorAmpacity).toBe(12);
-      expect(result.recommendedConductorSize).toBe('14'); // 20A still sufficient
+      expect(result.minConductorAmpacity).toBe(9);
+      expect(result.recommendedConductorSize).toBe('14'); // 20A sufficient
     });
     
-    it('should upsize conductor for larger continuous loads', () => {
+    it('should calculate conductor sizing consistently for large motors', () => {
       const input: MotorCircuitInput = {
         hp: '50',
         voltage: '240V-3ph',
         conductorMaterial: 'copper',
         terminalRating: 75,
-        continuousLoad: true,
+        continuousLoad: true, // Continuous load flag should not change result
       };
       
       const result = calculateMotorCircuit(input);
       
-      // 56.8A FLA * 1.25 * 1.25 = 88.75A → ceil = 89A
-      // Requires #3 AWG (100A) instead of #4 AWG (85A)
+      // 56.8A FLA * 1.25 = 71A → ceil = 71A
+      // #4 AWG @ 75°C = 85A (sufficient)
       expect(result.fla).toBe(56.8);
-      expect(result.minConductorAmpacity).toBe(89);
-      expect(result.recommendedConductorSize).toBe('3'); // Upsized from #4
+      expect(result.minConductorAmpacity).toBe(71);
+      expect(result.recommendedConductorSize).toBe('4');
     });
   });
 });
