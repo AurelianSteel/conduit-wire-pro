@@ -35,6 +35,10 @@ export default function MotorCircuitScreen() {
   const isFractionalHP = ['1/6', '1/4', '1/3', '1/2', '3/4', '1'].includes(hp);
   const isThreePhase = voltage.includes('3ph');
   const showInvalidComboError = isFractionalHP && isThreePhase;
+  
+  // Check if FLA data exists for this combo (some HP/voltage combos aren't available)
+  const hasFLAData = result && result.fla > 0;
+  const showNoFLAError = !hasFLAData && result === null;
 
   const hpOptions: MotorHP[] = ['1/6', '1/4', '1/3', '1/2', '3/4', '1', '1.5', '2', '3', '5', '7.5', '10', '15', '20', '25', '30', '40', '50', '60', '75', '100', '125', '150', '200'];
   
@@ -46,8 +50,12 @@ export default function MotorCircuitScreen() {
     { value: '480V-3ph', label: '480V 3Φ' },
   ];
 
+  // Force re-render when result changes to clear stale content
+  const resultKey = `${hp}-${voltage}-${material}-${terminalRating}-${continuousLoad}`;
+  
   return (
     <ScrollView
+      key={resultKey}
       style={styles.container}
       contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
       keyboardShouldPersistTaps="handled"
@@ -55,7 +63,7 @@ export default function MotorCircuitScreen() {
     >
       {/* HP Selector */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>MOTOR HORSEPOWER</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }} scrollEnabled={true}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: Spacing.md }}>
         {hpOptions.map((option) => (
           <TouchableOpacity
             key={option}
@@ -71,7 +79,7 @@ export default function MotorCircuitScreen() {
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
 
       {/* Voltage Selector */}
       <Text style={[styles.label, { color: colors.textSecondary }]}>VOLTAGE</Text>
@@ -168,8 +176,21 @@ export default function MotorCircuitScreen() {
         </View>
       )}
 
+      {/* Error Card - No FLA Data */}
+      {showNoFLAError && (
+        <View style={[styles.errorCard, { backgroundColor: colors.surface, borderColor: colors.warning }]}>
+          <Text style={[styles.errorIcon, { color: colors.warning }]}>⚠️</Text>
+          <Text style={[styles.errorTitle, { color: colors.warning }]}>Voltage Not Available</Text>
+          <Text style={[styles.errorMessage, { color: colors.textSecondary }]}>
+            {hp} HP is not available at {voltage.split('-')[0]}V single-phase.
+            {'\n\n'}
+            Try 240V 1Φ or select a different horsepower.
+          </Text>
+        </View>
+      )}
+
       {/* Results - Unified Card */}
-      {result && !showInvalidComboError && (
+      {result && !showInvalidComboError && !showNoFLAError && (
         <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {/* Motor Spec Header */}
           <View style={styles.resultHeader}>
@@ -244,12 +265,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   hpButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 8,
-    marginRight: Spacing.sm,
+    marginRight: Spacing.xs,
+    marginBottom: Spacing.xs,
     borderRadius: BorderRadius.md,
     borderWidth: 1,
-    minWidth: 50,
+    minWidth: 44,
     alignItems: 'center',
   },
   hpButtonText: { fontSize: FontSizes.sm, fontWeight: '600' },

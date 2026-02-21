@@ -2,7 +2,7 @@
   "expo": {
     "name": "Conduit & Wire Pro",
     "slug": "conduit-wire-pro",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "scheme": "conduitwirepro",
     "icon": "./assets/icon.png",
@@ -15,9 +15,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.illwired.conduitwirepro",
-      "buildNumber": "5",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "buildNumber": "6"
       }
     },
     "android": {

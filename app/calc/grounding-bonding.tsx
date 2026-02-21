@@ -66,7 +66,7 @@ export default function GroundingBondingScreen() {
       {activeTab === 'egc' ? (
         <>
           <Text style={[styles.label, { color: colors.textSecondary }]}>OCPD RATING (A)</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: Spacing.md }} scrollEnabled={true}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: Spacing.md }}>
             {groundingBondingData.egcOcpdRatings.map((rating) => (
               <TouchableOpacity
                 key={rating}
@@ -82,7 +82,7 @@ export default function GroundingBondingScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </>
       ) : (
         <>
@@ -188,12 +188,13 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   chip: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: BorderRadius.md,
     borderWidth: 1,
-    marginRight: Spacing.sm,
-    minWidth: 52,
+    marginRight: Spacing.xs,
+    marginBottom: Spacing.xs,
+    minWidth: 44,
     alignItems: 'center',
   },
   chipText: {
