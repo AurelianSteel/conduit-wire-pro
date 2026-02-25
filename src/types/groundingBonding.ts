@@ -2,6 +2,8 @@ export type GroundingMaterial = 'copper' | 'aluminum';
 
 export type GroundingMode = 'egc' | 'gec' | 'mbj';
 
+export type ElectrodeType = 'standard' | 'rod-pipe-plate' | 'concrete-encased';
+
 export type ConductorSize =
   | '8'
   | '6'
@@ -44,6 +46,7 @@ export interface EGCSizingResult {
 export interface GECSizingInput {
   largestUngroundedConductor: ConductorSize;
   material: GroundingMaterial;
+  electrodeType?: ElectrodeType;
 }
 
 export interface GECSizingResult {

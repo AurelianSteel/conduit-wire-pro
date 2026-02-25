@@ -8,7 +8,7 @@ import {
   calculateMBJSize,
   groundingBondingData,
 } from '../../src/services/groundingBondingService';
-import { ConductorSize, GroundingMaterial } from '../../src/types/groundingBonding';
+import { ConductorSize, GroundingMaterial, ElectrodeType } from '../../src/types/groundingBonding';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
 
 type ActiveTab = 'egc' | 'gec' | 'mbj';
@@ -22,6 +22,7 @@ export default function GroundingBondingScreen() {
 
   const [ocpdRating, setOcpdRating] = useState<number>(100);
   const [conductorSize, setConductorSize] = useState<ConductorSize>('4/0');
+  const [electrodeType, setElectrodeType] = useState<ElectrodeType>('standard');
   const [showConductorPicker, setShowConductorPicker] = useState(false);
 
   const result = useMemo(() => {
@@ -29,10 +30,10 @@ export default function GroundingBondingScreen() {
       return calculateEGCSize({ ocpdRating, material });
     }
     if (activeTab === 'gec') {
-      return calculateGECSize({ largestUngroundedConductor: conductorSize, material });
+      return calculateGECSize({ largestUngroundedConductor: conductorSize, material, electrodeType });
     }
-    return calculateMBJSize({ largestUngroundedConductor: conductorSize, material });
-  }, [activeTab, ocpdRating, material, conductorSize]);
+    return calculateMBJSize({ largestUngroundedConductor: conductorSize, material, electrodeType });
+  }, [activeTab, ocpdRating, material, conductorSize, electrodeType]);
 
   return (
     <ScrollView
@@ -129,6 +130,48 @@ export default function GroundingBondingScreen() {
               </View>
             </View>
           </Modal>
+
+          {/* Electrode Type Selector */}
+          <Text style={[styles.label, { color: colors.textSecondary }]}>ELECTRODE TYPE</Text>
+          <View style={{ marginBottom: Spacing.md }}>
+            {groundingBondingData.electrodeTypes.map((type) => (
+              <TouchableOpacity
+                key={type.value}
+                style={[
+                  styles.electrodeOption,
+                  { borderColor: colors.border },
+                  electrodeType === type.value && { backgroundColor: accentColor + '15', borderColor: accentColor },
+                ]}
+                onPress={() => setElectrodeType(type.value)}
+              >
+                <View style={styles.electrodeRadio}>
+                  <View style={[
+                    styles.electrodeRadioInner,
+                    electrodeType === type.value && { backgroundColor: accentColor }
+                  ]} />
+                </View>
+                <Text style={[styles.electrodeText, { color: electrodeType === type.value ? accentColor : colors.text }]}>
+                  {type.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          
+          {electrodeType === 'rod-pipe-plate' && (
+            <View style={[styles.infoBox, { backgroundColor: accentColor + '10', borderColor: accentColor }]}>
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                NEC 250.66(A): GEC to rod/pipe/plate electrodes need not be larger than 6 AWG copper or 4 AWG aluminum.
+              </Text>
+            </View>
+          )}
+          
+          {electrodeType === 'concrete-encased' && (
+            <View style={[styles.infoBox, { backgroundColor: accentColor + '10', borderColor: accentColor }]}>
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                NEC 250.66(B): GEC to concrete-encased electrodes need not be larger than 4 AWG copper.
+              </Text>
+            </View>
+          )}
         </>
       )}
 
@@ -230,6 +273,43 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: FontSizes.md,
     fontWeight: '600',
+  },
+  electrodeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.xs,
+  },
+  electrodeRadio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#22c55e',
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  electrodeRadioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  electrodeText: {
+    fontSize: FontSizes.sm,
+    fontWeight: '600',
+  },
+  infoBox: {
+    padding: 12,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    marginBottom: Spacing.md,
+  },
+  infoText: {
+    fontSize: FontSizes.sm,
+    lineHeight: 18,
   },
   resultCard: {
     borderWidth: 1,

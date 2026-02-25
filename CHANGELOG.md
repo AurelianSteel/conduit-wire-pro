@@ -1,6 +1,29 @@
-# Conduit & Wire Pro - Version 1.0.1 Changelog
+# Conduit & Wire Pro - Changelog
 
-## Changes in This Build
+## Version 1.0.2 (Unreleased)
+
+### 🔧 Grounding Electrode Conductor (GEC) Fixes
+- **Fixed GEC minimum size enforcement** - Now correctly applies NEC 250.66 minimums:
+  - Copper: 8 AWG minimum (was missing this constraint)
+  - Aluminum: 6 AWG minimum (was missing this constraint)
+- **Fixed GEC maximum size capping** - Now correctly applies "need not be larger than":
+  - Copper: 3/0 AWG maximum
+  - Aluminum: 250 kcmil maximum
+- **Added electrode type selector** - New UI option for GEC/MBJ sizing:
+  - Standard (Table 250.66)
+  - Rod/Pipe/Plate electrode (250.66(A) - max 6 AWG Cu / 4 AWG Al)
+  - Concrete-Encased/Ufer electrode (250.66(B) - max 4 AWG Cu)
+- **Added contextual info boxes** - Shows NEC exception text when electrode type is selected
+
+### 📋 Technical
+- Updated NEC Table 250.66 implementation with proper size comparison logic
+- Added 21 comprehensive GEC/MBJ tests (was 13, now 21)
+- Fixed conductor size comparison bug (AWG fractions were compared incorrectly)
+- Total test count: 192 (was 182)
+
+---
+
+## Version 1.0.1
 
 ### 🔧 Motor Circuit Calculator Fixes
 - **Fixed conductor sizing formula** - Now correctly applies 125% per NEC 430.22 (removed incorrect 156.25% continuous load multiplier)
@@ -14,16 +37,8 @@
 
 ### 📋 Technical
 - Version bumped to **1.0.1** (build 6)
-- NEC Table 310.16 ampacity corrections (from previous commit)
+- NEC Table 310.16 ampacity corrections
 - 119 NEC compliance tests added
 
-## Known Issues (to be addressed)
-- Motor circuit calculation edge cases need Mephisto audit (rescheduled)
-- Grounding/Bonding GEC sizing needs review
-
-## Next Steps
-- Test on TestFlight
-- Apple Org conversion in progress (D-U-N-S verified)
-
 ---
-*Built: 2026-02-20*
+*Last Updated: 2026-02-25*
