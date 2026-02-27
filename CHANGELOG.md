@@ -1,5 +1,23 @@
 # Conduit & Wire Pro - Changelog
 
+## Version 1.0.3 (Unreleased)
+
+### 🔧 Bend Radius Calculator (NEW)
+- **Added 9th calculator** - Cable Bend Radius per NEC Article 300.34
+- Supports 7 cable types with correct NEC multipliers:
+  - Nonshielded conductors: 8× diameter (300.34(A))
+  - Shielded conductors: 12× diameter (300.34(B))
+  - Interlocked armor: 7× diameter (300.34(C))
+  - Smooth metallic sheath: 8× diameter (300.34(D))
+  - Corrugated metallic sheath: 5× diameter (300.34(E))
+  - MC Cable: 5× diameter (330.24)
+  - AC (BX) Cable: 5× diameter (320.24)
+- **Optional precision mode** - Enter measured cable diameter for exact calculations
+- **Smart warnings** - Alerts for large conductors and manufacturer requirements
+- **Full test coverage** - 19 unit tests added (211 total tests passing)
+
+---
+
 ## Version 1.0.2 (Unreleased)
 
 ### 🔧 Grounding Electrode Conductor (GEC) Fixes
