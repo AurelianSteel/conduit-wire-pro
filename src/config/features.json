@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Feature flags for ConduitWirePro calculators and features",
+    "lastUpdated": "2026-02-27"
+  },
+  "calculators": {
+    "conduitFill": {
+      "enabled": true,
+      "version": "2.1.0",
+      "name": "Conduit Fill Calculator",
+      "description": "Calculate conduit fill percentages per NEC",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "voltageDrop": {
+      "enabled": true,
+      "version": "2.0.0",
+      "name": "Voltage Drop Calculator",
+      "description": "Calculate voltage drop for wire runs",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "boxFill": {
+      "enabled": true,
+      "version": "1.5.0",
+      "name": "Box Fill Calculator",
+      "description": "Calculate electrical box fill per NEC",
+      "betaOnly": false,
+      "minAppVersion": "1.2.0"
+    },
+    "wireAmpacity": {
+      "enabled": true,
+      "version": "1.8.0",
+      "name": "Wire Ampacity Calculator",
+      "description": "Calculate wire ampacity based on conditions",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "motorCircuit": {
+      "enabled": true,
+      "version": "1.2.0",
+      "name": "Motor Circuit Calculator",
+      "description": "Size motor branch circuits per NEC 430",
+      "betaOnly": false,
+      "minAppVersion": "1.5.0"
+    },
+    "dwellingLoad": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Dwelling Load Calculator",
+      "description": "Calculate dwelling unit loads per NEC 220",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "pipeBending": {
+      "enabled": false,
+      "version": "0.9.0-beta",
+      "name": "Pipe Bending Calculator",
+      "description": "Calculate conduit bend marks and offsets",
+      "betaOnly": true,
+      "minAppVersion": "2.0.0-beta"
+    },
+    "faultCurrent": {
+      "enabled": false,
+      "version": "0.8.0-beta",
+      "name": "Fault Current Calculator",
+      "description": "Calculate available fault current",
+      "betaOnly": true,
+      "minAppVersion": "2.0.0-beta"
+    }
+  },
+  "features": {
+    "cloudSync": {
+      "enabled": false,
+      "version": "1.0.0-beta",
+      "name": "Cloud Sync",
+      "description": "Sync calculations across devices",
+      "betaOnly": true,
+      "minAppVersion": "2.0.0-beta"
+    },
+    "projectFolders": {
+      "enabled": true,
+      "version": "1.3.0",
+      "name": "Project Folders",
+      "description": "Organize calculations into projects",
+      "betaOnly": false,
+      "minAppVersion": "1.5.0"
+    },
+    "pdfExport": {
+      "enabled": true,
+      "version": "1.1.0",
+      "name": "PDF Export",
+      "description": "Export calculations as PDF",
+      "betaOnly": false,
+      "minAppVersion": "1.3.0"
+    },
+    "darkMode": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Dark Mode",
+      "description": "Dark theme support",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "offlineMode": {
+      "enabled": false,
+      "version": "0.5.0-beta",
+      "name": "Offline Mode",
+      "description": "Full functionality without internet",
+      "betaOnly": true,
+      "minAppVersion": "2.0.0-beta"
+    },
+    "unitConversion": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Unit Conversion",
+      "description": "Metric/Imperial unit switching",
+      "betaOnly": false,
+      "minAppVersion": "1.2.0"
+    }
+  },
+  "betaUsers": [
+    "auric@example.com",
+    "test@conduitwire.pro"
+  ]
+}

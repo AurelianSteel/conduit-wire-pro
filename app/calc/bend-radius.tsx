@@ -5,6 +5,9 @@ import { calculateBendRadius, getAvailableConductorSizes, getCableTypeInfo } fro
 import { CableType, BendRadiusInput } from '../../src/types/bendRadius';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function BendRadiusScreen() {
   const { colors } = useTheme();
@@ -14,6 +17,7 @@ export default function BendRadiusScreen() {
   const [conductorSize, setConductorSize] = useState<string>('12');
   const [overallDiameter, setOverallDiameter] = useState<string>('');
   const [showDiameterInput, setShowDiameterInput] = useState<boolean>(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState<boolean>(false);
 
   const result = useMemo(() => {
     try {
@@ -42,6 +46,34 @@ export default function BendRadiusScreen() {
       ac: 'AC (BX) Cable',
     };
     return labels[type];
+  };
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result) return null;
+    
+    return {
+      calculatorType: 'bend-radius',
+      calculatorTitle: 'Bend Radius Calculator',
+      inputs: {
+        cableType: getCableTypeLabel(cableType),
+        conductorSize: `${conductorSize} AWG/kcmil`,
+        overallDiameter: overallDiameter ? `${overallDiameter}"` : 'Auto-estimated',
+      },
+      result: {
+        value: `${result.minRadiusInches.toFixed(2)}" (${result.minRadiusMm} mm)`,
+        label: 'Minimum Bend Radius',
+        details: {
+          multiplier: `${result.multiplier}x diameter`,
+          referenceDiameter: `${result.referenceDiameter.toFixed(3)}"`,
+        },
+      },
+      formula: `${result.multiplier} × ${result.referenceDiameter.toFixed(3)}" = ${result.minRadiusInches.toFixed(2)}"`,
+      necArticle: result.necArticle,
+      necReference: `NEC 2023 Article ${result.necArticle}`,
+      warnings: result.warnings,
+      timestamp: new Date(),
+    };
   };
 
   return (
@@ -197,6 +229,15 @@ export default function BendRadiusScreen() {
           </Text>
 
           <LegalDisclaimer />
+          
+          {buildShareData() && (
+            <ShareButton
+              data={buildShareData()!}
+              onPress={() => setShareSheetVisible(true)}
+              accentColor={accentColor}
+            />
+          )}
+          
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
             Reference: NEC 2023 Article {result.necArticle}
           </Text>
@@ -211,6 +252,15 @@ export default function BendRadiusScreen() {
             </View>
           )}
         </View>
+      )}
+      
+      {buildShareData() && (
+        <ShareSheet
+          visible={shareSheetVisible}
+          onClose={() => setShareSheetVisible(false)}
+          data={buildShareData()!}
+          accentColor={accentColor}
+        />
       )}
     </ScrollView>
   );
