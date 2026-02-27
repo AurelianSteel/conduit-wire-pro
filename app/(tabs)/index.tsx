@@ -71,6 +71,13 @@ export default function HomeScreen() {
       route: '/calc/service-feeder',
       color: '#06b6d4', // Cyan
     },
+    {
+      title: 'Bend Radius',
+      subtitle: 'Min cable bend radius',
+      icon: 'refresh-outline',
+      route: '/calc/bend-radius',
+      color: '#f97316', // Orange
+    },
   ];
 
   return (
@@ -82,7 +89,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Eight essential calculators for electricians
+          Nine essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>
