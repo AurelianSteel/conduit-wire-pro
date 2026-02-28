@@ -14,3 +14,6 @@ export interface HistoryEntry extends CalculationResult {
 
 // Bend Radius Calculator Types
 export * from './bendRadius';
+
+// Pipe Bending Calculator Types
+export * from './pipeBending';

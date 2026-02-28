@@ -78,6 +78,13 @@ export default function HomeScreen() {
       route: '/calc/bend-radius',
       color: '#f97316', // Orange
     },
+    {
+      title: 'Pipe Bending',
+      subtitle: 'Conduit offsets & saddles',
+      icon: 'options-outline',
+      route: '/calc/pipe-bending',
+      color: '#f59e0b', // Amber
+    },
   ];
 
   return (
@@ -89,7 +96,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Nine essential calculators for electricians
+          Ten essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>
