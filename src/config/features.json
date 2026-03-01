@@ -54,12 +54,12 @@
       "minAppVersion": "1.0.0"
     },
     "pipeBending": {
-      "enabled": false,
-      "version": "0.9.0-beta",
+      "enabled": true,
+      "version": "1.0.0",
       "name": "Pipe Bending Calculator",
       "description": "Calculate conduit bend marks and offsets",
-      "betaOnly": true,
-      "minAppVersion": "2.0.0-beta"
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
     },
     "faultCurrent": {
       "enabled": false,
