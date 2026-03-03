@@ -85,6 +85,13 @@ export default function HomeScreen() {
       route: '/calc/pipe-bending',
       color: '#f59e0b', // Amber
     },
+    {
+      title: 'Transformer Sizing',
+      subtitle: 'FLA, OCPD, fault current',
+      icon: 'flash-outline',
+      route: '/calc/transformer-sizing',
+      color: '#8b5cf6', // Purple
+    },
   ];
 
   return (
@@ -96,7 +103,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Ten essential calculators for electricians
+          Eleven essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>

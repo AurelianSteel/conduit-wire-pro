@@ -61,6 +61,14 @@
       "betaOnly": false,
       "minAppVersion": "1.0.0"
     },
+    "transformerSizing": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Transformer Sizing Calculator",
+      "description": "Calculate transformer FLA, OCPD, and fault current per NEC 450",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
     "faultCurrent": {
       "enabled": false,
       "version": "0.8.0-beta",

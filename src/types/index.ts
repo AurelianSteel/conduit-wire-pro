@@ -1,4 +1,8 @@
-export type CalculatorType = 'conduit-fill' | 'box-fill' | 'voltage-drop';
+export type CalculatorType =
+  | 'conduit-fill'
+  | 'box-fill'
+  | 'voltage-drop'
+  | 'transformer-sizing';
 
 export interface CalculationResult {
   type: CalculatorType;
@@ -17,3 +21,6 @@ export * from './bendRadius';
 
 // Pipe Bending Calculator Types
 export * from './pipeBending';
+
+// Transformer Calculator Types
+export * from './transformer';
