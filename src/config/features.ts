@@ -13,14 +13,19 @@
 import featuresData from './features.json';
 
 // Types
-export type CalculatorId = 
+export type CalculatorId =
   | 'conduitFill'
-  | 'voltageDrop' 
+  | 'voltageDrop'
   | 'boxFill'
   | 'wireAmpacity'
   | 'motorCircuit'
-  | 'dwellingLoad'
+  | 'parallelConductors'
+  | 'groundingBonding'
+  | 'serviceFeeder'
+  | 'bendRadius'
   | 'pipeBending'
+  | 'transformerSizing'
+  | 'dwellingLoad'
   | 'faultCurrent';
 
 export type FeatureId =

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.0.0",
     "description": "Feature flags for ConduitWirePro calculators and features",
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-05"
   },
   "calculators": {
     "conduitFill": {
@@ -44,6 +44,38 @@
       "description": "Size motor branch circuits per NEC 430",
       "betaOnly": false,
       "minAppVersion": "1.5.0"
+    },
+    "parallelConductors": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Parallel Conductor Calculator",
+      "description": "Size parallel wire runs per NEC 310.10(H)",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "groundingBonding": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Grounding & Bonding Calculator",
+      "description": "Size EGC, GEC, and MBJ per NEC 250",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "serviceFeeder": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Service Feeder Calculator",
+      "description": "Size dwelling services per NEC 220.82",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
+    },
+    "bendRadius": {
+      "enabled": true,
+      "version": "1.0.0",
+      "name": "Bend Radius Calculator",
+      "description": "Calculate minimum cable bend radius per NEC 300.34",
+      "betaOnly": false,
+      "minAppVersion": "1.0.0"
     },
     "dwellingLoad": {
       "enabled": true,
