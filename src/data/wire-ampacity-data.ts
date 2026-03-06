@@ -58,9 +58,9 @@ export const wireAmpacityData: Record<string, Record<string, number>> = {
   },
   '1': {
     'THHN/THWN': 130,
-    'THHN/THWN-2': 150,
-    'XHHW-2': 150,
-    'RHW-2': 150
+    'THHN/THWN-2': 145,
+    'XHHW-2': 145,
+    'RHW-2': 145
   },
   '1/0': {
     'THHN/THWN': 150,
