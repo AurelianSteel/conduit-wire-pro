@@ -92,6 +92,13 @@ export default function HomeScreen() {
       route: '/calc/transformer-sizing',
       color: '#8b5cf6', // Purple
     },
+    {
+      title: 'Fault Current',
+      subtitle: 'Available fault current & SCCR',
+      icon: 'flash-off-outline',
+      route: '/calc/fault-current',
+      color: '#ef4444', // Red
+    },
   ];
 
   return (
@@ -103,7 +110,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Conduit & Wire Pro</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Eleven essential calculators for electricians
+          Twelve essential calculators for electricians
         </Text>
       </View>
       <View style={styles.grid}>
