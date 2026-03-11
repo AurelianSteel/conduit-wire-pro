@@ -18,6 +18,9 @@ import {
 } from '../../src/types/pipeBending';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 type CalcMode = 'offset' | 'saddle' | 'ninety' | 'rolling';
 
@@ -49,6 +52,7 @@ export default function PipeBendingScreen() {
 
   // Quick reference
   const [showQuickRef, setShowQuickRef] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -571,6 +575,83 @@ export default function PipeBendingScreen() {
     }
   };
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result || result.error) return null;
+
+    const modeLabels: Record<CalcMode, string> = {
+      offset: "Offset Bend",
+      saddle: "Saddle Bend",
+      ninety: "90° Bend",
+      rolling: "Rolling Offset",
+    };
+
+    let inputs: Record<string, string> = {
+      calcMode: modeLabels[calcMode],
+      conduitSize: `${conduitSize}"`,
+    };
+
+    let resultValue = "";
+    let resultLabel = "";
+    let details: Record<string, string> = {};
+
+    if (result.type === "offset" && result.data) {
+      inputs.obstructionHeight = `${obstructionHeight}"`;
+      inputs.angle = `${offsetAngle}°`;
+      if (advanceDistance) inputs.advanceDistance = `${advanceDistance}"`;
+      resultValue = `A: ${result.data.bendMarks.firstBend?.toFixed(2) || "N/A"}"`;
+      resultLabel = "Offset Marks";
+      details = {
+        markB: `${result.data.bendMarks.secondBend?.toFixed(2) || "N/A"}"`,
+        travel: `${result.data.distanceBetweenBends?.toFixed(2) || "N/A"}"`,
+        multiplier: `${OFFSET_MULTIPLIERS[offsetAngle]}x`,
+      };
+    } else if (result.type === "saddle" && result.data) {
+      inputs.obstructionWidth = `${obstructionWidth}"`;
+      inputs.saddleType = saddleType === "3pt" ? "3-Point" : "4-Point";
+      inputs.angle = `${saddleAngle}°`;
+      resultValue = `${result.data.centerPoint?.toFixed(2) || "N/A"}"`;
+      resultLabel = "Center Mark";
+      details = {
+        sideMarks: result.data.marks?.map((m: number) => `${m.toFixed(2)}"`).join(", ") || "N/A",
+        shrinkage: `${result.data.shrinkage?.toFixed(2) || "N/A"}"`,
+      };
+    } else if (result.type === "ninety" && result.data) {
+      inputs.legLength = `${legLength}"`;
+      resultValue = `${result.data.takeUp?.toFixed(2) || "N/A"}"`;
+      resultLabel = "Take-Up";
+      details = {
+        cutLength: `${result.data.cutLength?.toFixed(2) || "N/A"}`,
+        stubHeight: `${result.data.bendMark?.toFixed(2) || "N/A"}"`,
+      };
+    } else if (result.type === "rolling" && result.data) {
+      inputs.verticalOffset = `${verticalOffset}"`;
+      inputs.horizontalOffset = `${horizontalOffset}"`;
+      inputs.angle = `${rollingAngle}°`;
+      resultValue = `${result.data.rollingOffset?.toFixed(2) || "N/A"}"`;
+      resultLabel = "Total Offset";
+      details = {
+        rollingAngle: `${result.data.angle?.toFixed(1) || "N/A"}°`,
+        trueOffset: `${result.data.rollingOffset?.toFixed(2) || "N/A"}"`,
+        travel: `${result.data.distanceBetweenBends?.toFixed(2) || "N/A"}"`,
+      };
+    }
+
+    return {
+      calculatorType: "pipe-bending",
+      calculatorTitle: "Pipe Bending Calculator",
+      inputs,
+      result: {
+        value: resultValue,
+        label: resultLabel,
+        details,
+      },
+      necArticle: "358.26, 344.26",
+      necReference: "NEC 2023 Articles 358.26, 344.26",
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}

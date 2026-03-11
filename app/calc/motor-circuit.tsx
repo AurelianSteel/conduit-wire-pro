@@ -6,6 +6,9 @@ import { MotorHP, MotorVoltage } from '../../src/data/motor-fla-data';
 import { ConductorMaterial } from '../../src/types/motor';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function MotorCircuitScreen() {
   const { colors } = useTheme();
@@ -16,6 +19,7 @@ export default function MotorCircuitScreen() {
   const [material, setMaterial] = useState<ConductorMaterial>('copper');
   const [terminalRating, setTerminalRating] = useState<60 | 75 | 90>(75);
   const [continuousLoad, setContinuousLoad] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -40,19 +44,54 @@ export default function MotorCircuitScreen() {
   const hasFLAData = result && result.fla > 0;
   const showNoFLAError = !hasFLAData && result === null;
 
+
+  const voltageOptions: { value: MotorVoltage; label: string }[] = [
+    { value: "120V-1ph", label: "120V 1Φ" },
+    { value: "240V-1ph", label: "240V 1Φ" },
+    { value: "208V-3ph", label: "208V 3Φ" },
+    { value: "240V-3ph", label: "240V 3Φ" },
+    { value: "480V-3ph", label: "480V 3Φ" },
+  ];
+
   const hpOptions: MotorHP[] = ['1/6', '1/4', '1/3', '1/2', '3/4', '1', '1.5', '2', '3', '5', '7.5', '10', '15', '20', '25', '30', '40', '50', '60', '75', '100', '125', '150', '200'];
   
-  const voltageOptions: { value: MotorVoltage; label: string }[] = [
-    { value: '120V-1ph', label: '120V 1Φ' },
-    { value: '240V-1ph', label: '240V 1Φ' },
-    { value: '208V-3ph', label: '208V 3Φ' },
-    { value: '240V-3ph', label: '240V 3Φ' },
-    { value: '480V-3ph', label: '480V 3Φ' },
-  ];
 
   // Force re-render when result changes to clear stale content
   const resultKey = `${hp}-${voltage}-${material}-${terminalRating}-${continuousLoad}`;
   
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result || showInvalidComboError || showNoFLAError) return null;
+
+    const voltageLabel = voltageOptions.find((v: {value: MotorVoltage; label: string}) => v.value === voltage)?.label || voltage;
+
+    return {
+      calculatorType: "motor-circuit",
+      calculatorTitle: "Motor Circuit Calculator",
+      inputs: {
+        horsepower: `${hp} HP`,
+        voltage: voltageLabel,
+        material: material === "copper" ? "Copper" : "Aluminum",
+        terminalRating: `${terminalRating}°C`,
+        continuousLoad: continuousLoad ? "Yes" : "No",
+      },
+      result: {
+        value: `${result.fla}A`,
+        label: "Full-Load Amps",
+        details: {
+          conductorSize: `#${result.recommendedConductorSize} AWG ${material}`,
+          ocpd: result.recommendedOCPD,
+          disconnectRating: `${result.minDisconnectRating}A`,
+          overloadRange: `${result.overloadMin}A - ${result.overloadMax}A`,
+        },
+      },
+      necArticle: result.necArticle,
+      necReference: `NEC 2023 Article ${result.necArticle}`,
+      warnings: result.warnings.length > 0 ? result.warnings : undefined,
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       key={resultKey}
@@ -198,7 +237,7 @@ export default function MotorCircuitScreen() {
               MOTOR SPECIFICATION
             </Text>
             <Text style={[styles.resultMotor, { color: accentColor }]}>
-              {hp} HP @ {voltageOptions.find(v => v.value === voltage)?.label}
+              {hp} HP @ {voltageOptions.find((v: {value: MotorVoltage; label: string}) => v.value === voltage)?.label}
             </Text>
             <Text style={[styles.resultFLA, { color: colors.text }]}>
               Full-Load Amps: {result.fla}A
@@ -236,6 +275,15 @@ export default function MotorCircuitScreen() {
           </Text>
 
           <LegalDisclaimer />
+
+          {buildShareData() && (
+            <ShareButton
+              data={buildShareData()!}
+              onPress={() => setShowShareSheet(true)}
+              accentColor={accentColor}
+            />
+          )}
+
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
             Reference: NEC 2023 Article {result.necArticle}
           </Text>
@@ -251,6 +299,20 @@ export default function MotorCircuitScreen() {
           )}
         </View>
       )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={buildShareData() || {
+          calculatorType: "motor-circuit",
+          calculatorTitle: "Motor Circuit Calculator",
+          inputs: {},
+          result: { value: "", label: "" },
+          necArticle: "430",
+          necReference: "NEC 2023 Article 430",
+        }}
+        accentColor={accentColor}
+      />
     </ScrollView>
   );
 }

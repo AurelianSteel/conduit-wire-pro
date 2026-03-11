@@ -5,6 +5,9 @@ import { calculateDeratedAmpacity } from '../../src/services/ampacityService';
 import { WireSize, InsulationType, ConductorCountRange, AmpacityInput } from '../../src/types/ampacity';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function WireAmpacityScreen() {
   const { colors } = useTheme();
@@ -15,6 +18,7 @@ export default function WireAmpacityScreen() {
   const [ambientTempC, setAmbientTempC] = useState<number>(30);
   const [conductorCountRange, setConductorCountRange] = useState<ConductorCountRange>('1-3');
   const [continuousLoad, setContinuousLoad] = useState<boolean>(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -38,6 +42,37 @@ export default function WireAmpacityScreen() {
 
   const celsiusToFahrenheit = (c: number): number => Math.round((c * 9/5) + 32);
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result) return null;
+
+    return {
+      calculatorType: "wire-ampacity",
+      calculatorTitle: "Wire Ampacity Calculator",
+      inputs: {
+        wireSize: `#${wireSize} AWG`,
+        insulationType,
+        ambientTemp: `${ambientTempC}°C (${Math.round((ambientTempC * 9/5) + 32)}°F)`,
+        conductorCount: conductorCountRange,
+        continuousLoad: continuousLoad ? "Yes" : "No",
+      },
+      result: {
+        value: `${result.deratedAmpacity}A`,
+        label: "Final Ampacity",
+        details: {
+          baseAmpacity: `${result.baseAmpacity}A`,
+          tempFactor: `× ${result.temperatureCorrectionFactor.toFixed(2)}`,
+          adjustmentFactor: `× ${result.adjustmentFactor.toFixed(2)}`,
+          continuousFactor: `× ${result.continuousFactor.toFixed(2)}`,
+        },
+      },
+      necArticle: result.necArticle,
+      necReference: `NEC 2023 Article ${result.necArticle}`,
+      warnings: result.warnings.length > 0 ? result.warnings : undefined,
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={styles.container}
@@ -180,6 +215,15 @@ export default function WireAmpacityScreen() {
           </Text>
 
           <LegalDisclaimer />
+
+          {buildShareData() && (
+            <ShareButton
+              data={buildShareData()!}
+              onPress={() => setShowShareSheet(true)}
+              accentColor={accentColor}
+            />
+          )}
+
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
             Reference: NEC 2023 Article {result.necArticle}
           </Text>
@@ -195,6 +239,20 @@ export default function WireAmpacityScreen() {
           )}
         </View>
       )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={buildShareData() || {
+          calculatorType: "wire-ampacity",
+          calculatorTitle: "Wire Ampacity Calculator",
+          inputs: {},
+          result: { value: "", label: "" },
+          necArticle: "310.16",
+          necReference: "NEC 2023 Article 310.16",
+        }}
+        accentColor={accentColor}
+      />
     </ScrollView>
   );
 }

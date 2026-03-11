@@ -17,6 +17,9 @@ import {
 } from '../../src/data/box-dimensions';
 import { calculateBoxFill } from '../../src/engines/box-fill-engine';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 const WIRE_SIZES = [14, 12, 10, 8, 6];
 
@@ -39,6 +42,7 @@ export default function BoxFillScreen() {
   const [hasGrounds, setHasGrounds] = useState(true);
 
   const [showAddConductorsModal, setShowAddConductorsModal] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
   const [newWireSize, setNewWireSize] = useState(14);
   const [newWireCount, setNewWireCount] = useState(1);
 
@@ -128,6 +132,35 @@ export default function BoxFillScreen() {
     ...(hasGrounds ? [{ label: 'Equipment grounds (all)', value: breakdown.grounds.volume }] : []),
   ];
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!minimumBox) return null;
+
+    return {
+      calculatorType: "box-fill",
+      calculatorTitle: "Box Fill Calculator",
+      inputs: {
+        conductors: conductorSummary,
+        totalConductors,
+        deviceYokes,
+        hasClamps: hasClamps ? "Yes" : "No",
+        hasGrounds: hasGrounds ? "Yes" : "No",
+      },
+      result: {
+        value: minimumBox.name,
+        label: "Minimum Box Size",
+        details: {
+          volume: `${minimumBox.volumeIn3} in³`,
+          requiredVolume: `${totalVolume.toFixed(2)} in³`,
+          boxType: minimumBox.type,
+        },
+      },
+      necArticle: "314.16",
+      necReference: "NEC 2023 Article 314.16",
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -277,6 +310,28 @@ export default function BoxFillScreen() {
       </View>
 
       <LegalDisclaimer />
+
+      {buildShareData() && (
+        <ShareButton
+          data={buildShareData()!}
+          onPress={() => setShowShareSheet(true)}
+          accentColor={colors.secondary}
+        />
+      )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={buildShareData() || {
+          calculatorType: "box-fill",
+          calculatorTitle: "Box Fill Calculator",
+          inputs: {},
+          result: { value: "", label: "" },
+          necArticle: "314.16",
+          necReference: "NEC 2023 Article 314.16",
+        }}
+        accentColor={colors.secondary}
+      />
 
       <Modal visible={showAddConductorsModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>

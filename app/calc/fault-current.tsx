@@ -10,6 +10,9 @@ import {
 import { useTheme } from '../../src/hooks/useTheme';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 import { Ionicons } from '@expo/vector-icons';
 import {
   calculateFaultCurrent,
@@ -44,6 +47,7 @@ export default function FaultCurrentScreen() {
   const [conductorSize, setConductorSize] = useState<string>('4/0');
   const [conductorType, setConductorType] = useState<ConductorMaterial>('copper');
   const [includeMotor, setIncludeMotor] = useState<boolean>(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
   const [motorHp, setMotorHp] = useState<string>('50');
 
   // Calculate result
@@ -131,6 +135,38 @@ export default function FaultCurrentScreen() {
     </View>
   );
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result) return null;
+
+    return {
+      calculatorType: "fault-current",
+      calculatorTitle: "Fault Current Calculator",
+      inputs: {
+        kva: `${kva} kVA`,
+        primaryVoltage: `${primaryVoltage}V`,
+        secondaryVoltage: `${secondaryVoltage}V`,
+        impedance: `${impedance}%`,
+        phase: phase === "single" ? "Single Phase" : "Three Phase",
+        ...(includeConductor && conductorLength ? { conductorLength: `${conductorLength} ft` } : {}),
+        ...(includeConductor && conductorSize ? { conductorSize } : {}),
+        ...(includeMotor && motorHp ? { motorContribution: `${motorHp} HP` } : {}),
+      },
+      result: {
+        value: formatFaultCurrent(result.totalFaultCurrent),
+        label: "Available Fault Current",
+        details: {
+          transformerFaultCurrent: formatFaultCurrent(result.transformerFaultCurrent),
+          transformerFLA: `${result.transformerFLA.toFixed(1)}A`,
+          sccrRequired: result.sccrRequired,
+        },
+      },
+      necArticle: "110.9, 110.10",
+      necReference: "NEC 2023 Articles 110.9, 110.10",
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -365,6 +401,28 @@ export default function FaultCurrentScreen() {
           </View>
         </View>
       )}
+
+      {buildShareData() && (
+        <ShareButton
+          data={buildShareData()!}
+          onPress={() => setShowShareSheet(true)}
+          accentColor={accentColor}
+        />
+      )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={buildShareData() || {
+          calculatorType: "fault-current",
+          calculatorTitle: "Fault Current Calculator",
+          inputs: {},
+          result: { value: "", label: "" },
+          necArticle: "110.9",
+          necReference: "NEC 2023 Article 110.9",
+        }}
+        accentColor={accentColor}
+      />
 
       <LegalDisclaimer />
     </ScrollView>

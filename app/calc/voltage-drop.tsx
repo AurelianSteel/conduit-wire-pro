@@ -21,6 +21,9 @@ import {
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { useHistory } from '../../src/hooks/useHistory';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function VoltageDropScreen() {
   const { colors } = useTheme();
@@ -36,6 +39,7 @@ export default function VoltageDropScreen() {
   const [current, setCurrent] = useState('20');
   const [distance, setDistance] = useState('100');
   const [showResults, setShowResults] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const selectedVoltage = systemVoltages[voltageIdx];
 
@@ -80,6 +84,35 @@ export default function VoltageDropScreen() {
 
   const best = recommendation?.bestChoice;
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!best) return null;
+
+    return {
+      calculatorType: "voltage-drop",
+      calculatorTitle: "Voltage Drop Calculator",
+      inputs: {
+        voltage: selectedVoltage.label,
+        material: material === "copper" ? "Copper" : "Aluminum",
+        current: `${current}A`,
+        distance: `${distance} ft`,
+      },
+      result: {
+        value: formatWireSize(best.wireSize),
+        label: "Recommended Wire Size",
+        details: {
+          voltageDrop: `${best.voltageDropPercent}%`,
+          voltsLost: `${best.voltageDrop}V`,
+          voltageAtLoad: `${best.voltageAtLoad}V`,
+          status: getVDStatusLabel(best.voltageDropPercent),
+        },
+      },
+      necArticle: "210.19, 215.2",
+      necReference: "NEC 2023 Articles 210.19, 215.2",
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -272,8 +305,30 @@ export default function VoltageDropScreen() {
           </View>
 
           <LegalDisclaimer />
+
+          {buildShareData() && (
+            <ShareButton
+              data={buildShareData()!}
+              onPress={() => setShowShareSheet(true)}
+              accentColor={colors.success}
+            />
+          )}
         </View>
       )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={buildShareData() || {
+          calculatorType: "voltage-drop",
+          calculatorTitle: "Voltage Drop Calculator",
+          inputs: {},
+          result: { value: "", label: "" },
+          necArticle: "210.19, 215.2",
+          necReference: "NEC 2023 Articles 210.19, 215.2",
+        }}
+        accentColor={colors.success}
+      />
 
       {showResults && !best && (
         <View style={[styles.errorCard, { backgroundColor: colors.error + '15', borderColor: colors.error }]}>

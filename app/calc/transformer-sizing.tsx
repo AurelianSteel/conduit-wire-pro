@@ -11,6 +11,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useHistory } from '../../src/hooks/useHistory';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 import {
   calculateTransformerSpecs,
   calculateFLA,
@@ -40,6 +43,7 @@ export default function TransformerSizingScreen() {
   const [secondaryVoltage, setSecondaryVoltage] = useState<VoltageLevel>(208);
   const [impedancePercent, setImpedancePercent] = useState<string>('1.5');
   const [showResults, setShowResults] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     const kvaNum = parseFloat(kva);
@@ -96,6 +100,40 @@ export default function TransformerSizingScreen() {
     }
   }, [kva]);
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result) return null;
+
+    const primaryVoltageLabel = VOLTAGE_DESCRIPTIONS[primaryVoltage] || `${primaryVoltage}V`;
+    const secondaryVoltageLabel = VOLTAGE_DESCRIPTIONS[secondaryVoltage] || `${secondaryVoltage}V`;
+
+    return {
+      calculatorType: "transformer-sizing",
+      calculatorTitle: "Transformer Sizing Calculator",
+      inputs: {
+        kva: `${kva} kVA`,
+        phase: phase === "single" ? "Single Phase" : "Three Phase",
+        primaryVoltage: primaryVoltageLabel,
+        secondaryVoltage: secondaryVoltageLabel,
+        impedance: `${impedancePercent}%`,
+      },
+      result: {
+        value: `${result.secondaryFLA}A`,
+        label: "Secondary FLA",
+        details: {
+          primaryFLA: `${result.primaryFLA}A`,
+          primaryOCPD: result.primaryOCPD,
+          secondaryOCPD: result.secondaryOCPD,
+          faultCurrent: result.faultCurrent ? formatAmps(result.faultCurrent) : "N/A",
+          turnsRatio: result.turnsRatio.toFixed(2),
+        },
+      },
+      necArticle: "450.3",
+      necReference: "NEC 2023 Article 450.3",
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}

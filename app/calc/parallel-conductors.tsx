@@ -4,6 +4,9 @@ import { useTheme } from '../../src/hooks/useTheme';
 import { calculateParallelConductors, recommendParallelRuns } from '../../src/services/parallelConductorService';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function ParallelConductorsScreen() {
   const { colors } = useTheme();
@@ -15,6 +18,7 @@ export default function ParallelConductorsScreen() {
   const [terminalRating, setTerminalRating] = useState<60 | 75 | 90>(75);
   const [includeNeutral, setIncludeNeutral] = useState(false);
   const [showOptimizer, setShowOptimizer] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -45,6 +49,38 @@ export default function ParallelConductorsScreen() {
 
   const runOptions = [2, 3, 4, 5, 6];
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result) return null;
+    if ("error" in result) return null;
+
+    
+
+    return {
+      calculatorType: "parallel-conductors",
+      calculatorTitle: "Parallel Conductors Calculator",
+      inputs: {
+        totalAmpacity: `${totalAmpacity}A`,
+        parallelRuns: numRuns.toString(),
+        material: material === "copper" ? "Copper" : "Aluminum",
+        terminalRating: `${terminalRating}°C`,
+        includeNeutral: includeNeutral ? "Yes" : "No",
+      },
+      result: {
+        value: result.recommendedSize,
+        label: "Recommended Wire Size",
+        details: {
+          perRunAmpacity: `${result.ampacityPerConductor}A`,
+          totalAmpacity: `${result.ampacityPerConductor * numRuns}A`,
+        },
+      },
+      necArticle: "310.10(G)",
+      necReference: "NEC 2023 Article 310.10(G)",
+      warnings: result.warnings,
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={styles.container}
