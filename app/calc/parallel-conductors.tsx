@@ -168,7 +168,7 @@ export default function ParallelConductorsScreen() {
           <Text style={[styles.optimizerSubtitle, { color: colors.textTertiary }]}>
             Sorted by efficiency (ampacity utilization)
           </Text>
-          {recommendations.slice(0, 3).map((rec, idx) => (
+          {recommendations.slice(0, 3).map((rec: { numRuns: number; size: string; efficiency: number }, idx: number) => (
             <View key={rec.numRuns} style={styles.recommendationRow}>
               <Text style={[styles.recText, { color: colors.text }]}>
                 {idx === 0 ? '🏆 ' : ''}{rec.numRuns} runs of {rec.size} AWG
@@ -286,7 +286,7 @@ export default function ParallelConductorsScreen() {
 
           {result.warnings.length > 0 && (
             <View style={{ marginTop: Spacing.md }}>
-              {result.warnings.map((warning, i) => (
+              {result.warnings.map((warning: string, i: number) => (
                 <Text key={i} style={[styles.warning, { color: colors.warning }]}>
                   {warning}
                 </Text>

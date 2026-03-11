@@ -7,6 +7,9 @@ import { ConduitType } from '../../src/data/conduit-dimensions';
 import { WireInsulationType } from '../../src/data/wire-dimensions';
 import { calculateConduitFill } from '../../src/engines/conduit-fill-engine';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 const CONDUIT_TYPES: ConduitType[] = ['EMT', 'IMC', 'RMC', 'PVC-40', 'PVC-80'];
 const TRADE_SIZES = ['1/2', '3/4', '1', '1-1/4', '1-1/2', '2', '2-1/2', '3', '3-1/2', '4'];
@@ -51,6 +54,7 @@ export default function ConduitFillScreen() {
   const [newWireSize, setNewWireSize] = useState('12');
   const [newInsulationType, setNewInsulationType] = useState<WireInsulationType>('THHN');
   const [newWireCount, setNewWireCount] = useState(1);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     return calculateConduitFill({
@@ -316,6 +320,61 @@ export default function ConduitFillScreen() {
           </Text>
         )}
       </View>
+
+      {selectedResult && (
+        <ShareButton
+          data={{
+            calculatorType: 'conduit-fill',
+            calculatorTitle: 'Conduit Fill Calculator',
+            inputs: {
+              conduitType,
+              tradeSize: tradeSize + '"',
+              conductors: summaryText,
+              totalConductors,
+            },
+            result: {
+              value: selectedResult.fillPercent.toFixed(1) + '%',
+              label: 'Conduit Fill',
+              details: {
+                passes: selectedResult.passes ? 'Yes' : 'No',
+                maxFill: maxFillPercent + '%',
+              },
+            },
+            necArticle: 'Chapter 9, Table 1',
+            necReference: 'NEC 2023 Chapter 9, Table 1',
+            timestamp: new Date(),
+          }}
+          onPress={() => setShowShareSheet(true)}
+          accentColor={colors.primary}
+        />
+      )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={{
+          calculatorType: 'conduit-fill',
+          calculatorTitle: 'Conduit Fill Calculator',
+          inputs: {
+            conduitType,
+            tradeSize: tradeSize + '"',
+            conductors: summaryText,
+            totalConductors,
+          },
+          result: {
+            value: selectedResult ? selectedResult.fillPercent.toFixed(1) + '%' : 'N/A',
+            label: 'Conduit Fill',
+            details: {
+              passes: selectedResult?.passes ? 'Yes' : 'No',
+              maxFill: maxFillPercent + '%',
+            },
+          },
+          necArticle: 'Chapter 9, Table 1',
+          necReference: 'NEC 2023 Chapter 9, Table 1',
+          timestamp: new Date(),
+        }}
+        accentColor={colors.primary}
+      />
 
       <LegalDisclaimer />
 

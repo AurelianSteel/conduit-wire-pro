@@ -97,7 +97,7 @@ export default function FaultCurrentScreen() {
       <Text style={[
         styles.chipText,
         { color: selected ? '#fff' : colors.text }
-      ]]}>{label}</Text>
+      ]}>{label}</Text>
     </TouchableOpacity>
   );
 
