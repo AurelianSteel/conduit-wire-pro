@@ -5,6 +5,9 @@ import { calculateServiceFeeder } from '../../src/services/serviceFeederService'
 import { ServiceFeederInput } from '../../src/types/serviceFeeder';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function ServiceFeederScreen() {
   const { colors } = useTheme();
@@ -32,6 +35,7 @@ export default function ServiceFeederScreen() {
   
   // Voltage
   const [voltage, setVoltage] = useState<string>('240');
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -75,6 +79,38 @@ export default function ServiceFeederScreen() {
 
   const circuitOptions = [1, 2, 3, 4];
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result || "error" in result) return null;
+
+    return {
+      calculatorType: "service-feeder",
+      calculatorTitle: "Service/Feeder Calculator",
+      inputs: {
+        squareFootage: `${squareFootage} sq ft`,
+        voltage: `${voltage}V`,
+        smallApplianceCircuits: smallApplianceCircuits.toString(),
+        laundryCircuit: includeLaundryCircuit ? "Yes" : "No",
+        range: includeRange ? `${rangeKW} kW` : "None",
+        dryer: includeDryer ? `${dryerKW} kW` : "None",
+        heating: heatingKW !== "0" ? `${heatingKW} kW` : "None",
+        cooling: coolingKW !== "0" ? `${coolingKW} kW` : "None",
+      },
+      result: {
+        value: `${result.recommendedService}A`,
+        label: "Recommended Service",
+        details: {
+          calculatedAmps: `${result.calculatedAmps.toFixed(1)}A`,
+          utilization: `${result.utilizationPercent.toFixed(1)}%`,
+          exceeds80Percent: result.exceeds80PercentRule ? "Yes" : "No",
+        },
+      },
+      necArticle: "220.82",
+      necReference: "NEC 2023 Article 220.82 (Optional Calculation)",
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={styles.container}
@@ -368,6 +404,15 @@ export default function ServiceFeederScreen() {
           )}
 
           <LegalDisclaimer />
+
+          {buildShareData() && (
+            <ShareButton
+              data={buildShareData()!}
+              onPress={() => setShowShareSheet(true)}
+              accentColor={accentColor}
+            />
+          )}
+
           {/* NEC Reference */}
           <Text style={[styles.necRef, { color: colors.textTertiary }]}>
             Based on NEC Article {result.necArticle}
@@ -382,6 +427,20 @@ export default function ServiceFeederScreen() {
           </Text>
         </View>
       )}
+
+      <ShareSheet
+        visible={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        data={buildShareData() || {
+          calculatorType: "service-feeder",
+          calculatorTitle: "Service/Feeder Calculator",
+          inputs: {},
+          result: { value: "", label: "" },
+          necArticle: "220.82",
+          necReference: "NEC 2023 Article 220.82 (Optional Calculation)",
+        }}
+        accentColor={accentColor}
+      />
     </ScrollView>
   );
 }

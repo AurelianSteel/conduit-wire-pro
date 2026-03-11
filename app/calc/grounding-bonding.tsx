@@ -10,6 +10,9 @@ import {
 } from '../../src/services/groundingBondingService';
 import { ConductorSize, GroundingMaterial, ElectrodeType } from '../../src/types/groundingBonding';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 type ActiveTab = 'egc' | 'gec' | 'mbj';
 
@@ -24,6 +27,7 @@ export default function GroundingBondingScreen() {
   const [conductorSize, setConductorSize] = useState<ConductorSize>('4/0');
   const [electrodeType, setElectrodeType] = useState<ElectrodeType>('standard');
   const [showConductorPicker, setShowConductorPicker] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   const result = useMemo(() => {
     if (activeTab === 'egc') {
@@ -35,6 +39,48 @@ export default function GroundingBondingScreen() {
     return calculateMBJSize({ largestUngroundedConductor: conductorSize, material, electrodeType });
   }, [activeTab, ocpdRating, material, conductorSize, electrodeType]);
 
+
+  // Build share data from result
+  const buildShareData = (): ShareData | null => {
+    if (!result) return null;
+
+    const tabLabels: Record<ActiveTab, string> = {
+      egc: "Equipment Grounding Conductor",
+      gec: "Grounding Electrode Conductor",
+      mbj: "Main Bonding Jumper",
+    };
+
+    let inputs: Record<string, string> = {
+      calculationType: tabLabels[activeTab],
+      material: material === "copper" ? "Copper" : "Aluminum",
+    };
+
+    if (activeTab === "egc") {
+      inputs.ocpdRating = `${ocpdRating}A`;
+    } else {
+      inputs.largestConductor = conductorSize;
+      inputs.electrodeType = electrodeType;
+    }
+
+    const sizeValue = "minimumSize" in result ? result.minimumSize : "N/A";
+    const necRef = "necReference" in result ? result.necReference : "250.66/250.122";
+
+    return {
+      calculatorType: "grounding-bonding",
+      calculatorTitle: "Grounding & Bonding Calculator",
+      inputs,
+      result: {
+        value: sizeValue,
+        label: "Required Size",
+        details: {
+          notes: "details" in result ? result.details : "",
+        },
+      },
+      necArticle: necRef,
+      necReference: `NEC 2023 ${necRef}`,
+      timestamp: new Date(),
+    };
+  };
   return (
     <ScrollView
       style={styles.container}
