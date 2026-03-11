@@ -1,0 +1,16 @@
+#!/bin/sh
+# Pre-commit hook for ConduitWirePro
+# Enforces TypeScript type checking before allowing commits
+
+echo "🔍 Running TypeScript type check..."
+npx tsc --noEmit
+
+if [ $? -ne 0 ]; then
+    echo "❌ TypeScript type check failed. Please fix errors before committing."
+    exit 1
+fi
+
+echo "✅ TypeScript type check passed."
+
+# Optional: Run expo-doctor if available (for Expo projects)
+npx expo-doctor 2>/dev/null || true
