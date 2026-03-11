@@ -139,8 +139,8 @@ export default function BoxFillScreen() {
       {conductorEntries.map((entry) => (
         <View key={entry.id} style={[styles.entryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <View style={styles.entryTopRow}>
-            <View style={[styles.entryChip, { backgroundColor: '#FF8C4222' }]}>
-              <Text style={[styles.entryChipText, { color: '#FF8C42' }]}>#{entry.awg} AWG</Text>
+            <View style={[styles.entryChip, { backgroundColor: colors.secondary + '22' }]}>
+              <Text style={[styles.entryChipText, { color: colors.secondary }]}>#{entry.awg} AWG</Text>
             </View>
             <TouchableOpacity onPress={() => removeEntry(entry.id)} style={[styles.deleteBtn, { borderColor: colors.error }]}> 
               <Text style={[styles.deleteBtnText, { color: colors.error }]}>✕</Text>
@@ -152,7 +152,7 @@ export default function BoxFillScreen() {
               style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
               onPress={() => adjustEntryCount(entry.id, -1)}
             >
-              <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
+              <Text style={[styles.counterBtnText, { color: colors.secondary }]}>−</Text>
             </TouchableOpacity>
             <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
               <Text style={[styles.counterValue, { color: colors.text }]}>{entry.quantity}</Text>
@@ -161,7 +161,7 @@ export default function BoxFillScreen() {
               style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
               onPress={() => adjustEntryCount(entry.id, 1)}
             >
-              <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>+</Text>
+              <Text style={[styles.counterBtnText, { color: colors.secondary }]}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -171,7 +171,7 @@ export default function BoxFillScreen() {
         style={[styles.addBtn, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
         onPress={() => setShowAddConductorsModal(true)}
       >
-        <Text style={[styles.addBtnText, { color: '#FF8C42' }]}>+ Add Conductors</Text>
+        <Text style={[styles.addBtnText, { color: colors.secondary }]}>+ Add Conductors</Text>
       </TouchableOpacity>
 
       <Text style={[styles.label, { color: colors.textSecondary }]}>DEVICE YOKES (switches/receptacles)</Text>
@@ -180,7 +180,7 @@ export default function BoxFillScreen() {
           style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
           onPress={() => adjustCount(setDeviceYokes, deviceYokes, -1)}
         >
-          <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
+          <Text style={[styles.counterBtnText, { color: colors.secondary }]}>−</Text>
         </TouchableOpacity>
         <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <Text style={[styles.counterValue, { color: colors.text }]}>{deviceYokes}</Text>
@@ -189,7 +189,7 @@ export default function BoxFillScreen() {
           style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
           onPress={() => adjustCount(setDeviceYokes, deviceYokes, 1)}
         >
-          <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>+</Text>
+          <Text style={[styles.counterBtnText, { color: colors.secondary }]}>+</Text>
         </TouchableOpacity>
       </View>
 
@@ -198,7 +198,7 @@ export default function BoxFillScreen() {
         <Switch
           value={hasClamps}
           onValueChange={setHasClamps}
-          trackColor={{ true: '#FF8C42', false: colors.border }}
+          trackColor={{ true: colors.secondary, false: colors.border }}
         />
       </View>
       <View style={[styles.toggleRow, { borderColor: colors.border }]}> 
@@ -206,7 +206,7 @@ export default function BoxFillScreen() {
         <Switch
           value={hasGrounds}
           onValueChange={setHasGrounds}
-          trackColor={{ true: '#FF8C42', false: colors.border }}
+          trackColor={{ true: colors.secondary, false: colors.border }}
         />
       </View>
 
@@ -245,8 +245,8 @@ export default function BoxFillScreen() {
           </View>
         ))}
         <View style={[styles.breakdownRow, { borderBottomWidth: 0 }]}> 
-          <Text style={[styles.breakdownItem, { color: '#FF8C42', fontWeight: '700' }]}>Total</Text>
-          <Text style={[styles.breakdownValue, { color: '#FF8C42', fontWeight: '700' }]}>
+          <Text style={[styles.breakdownItem, { color: colors.secondary, fontWeight: '700' }]}>Total</Text>
+          <Text style={[styles.breakdownValue, { color: colors.secondary, fontWeight: '700' }]}>
             {totalVolume.toFixed(2)} in³
           </Text>
         </View>
@@ -291,7 +291,7 @@ export default function BoxFillScreen() {
                   style={[
                     styles.chip,
                     { borderColor: colors.border },
-                    newWireSize === ws && { backgroundColor: '#FF8C42', borderColor: '#FF8C42' },
+                    newWireSize === ws && { backgroundColor: colors.secondary, borderColor: colors.secondary },
                   ]}
                   onPress={() => setNewWireSize(ws)}
                 >
@@ -306,7 +306,7 @@ export default function BoxFillScreen() {
                 style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
                 onPress={() => setNewWireCount((count) => Math.max(1, count - 1))}
               >
-                <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>−</Text>
+                <Text style={[styles.counterBtnText, { color: colors.secondary }]}>−</Text>
               </TouchableOpacity>
               <View style={[styles.counterDisplay, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
                 <Text style={[styles.counterValue, { color: colors.text }]}>{newWireCount}</Text>
@@ -315,12 +315,12 @@ export default function BoxFillScreen() {
                 style={[styles.counterBtn, { backgroundColor: colors.surfaceElevated }]}
                 onPress={() => setNewWireCount((count) => Math.min(50, count + 1))}
               >
-                <Text style={[styles.counterBtnText, { color: '#FF8C42' }]}>+</Text>
+                <Text style={[styles.counterBtnText, { color: colors.secondary }]}>+</Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={[styles.modalAction, { backgroundColor: '#FF8C42', opacity: newWireCount > 0 ? 1 : 0.5 }]}
+              style={[styles.modalAction, { backgroundColor: colors.secondary, opacity: newWireCount > 0 ? 1 : 0.5 }]}
               onPress={addEntry}
               disabled={newWireCount <= 0}
             >
@@ -331,7 +331,7 @@ export default function BoxFillScreen() {
               style={[styles.modalCancel, { backgroundColor: colors.surfaceElevated }]}
               onPress={() => setShowAddConductorsModal(false)}
             >
-              <Text style={{ color: '#FF8C42', fontWeight: '700', fontSize: FontSizes.md }}>Cancel</Text>
+              <Text style={{ color: colors.secondary, fontWeight: '700', fontSize: FontSizes.md }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -186,7 +186,7 @@ export default function WireAmpacityScreen() {
 
           {result.warnings.length > 0 && (
             <View style={{ marginTop: Spacing.md }}>
-              {result.warnings.map((warning, i) => (
+              {result.warnings.map((warning: string, i: number) => (
                 <Text key={i} style={[styles.warning, { color: colors.warning }]}>
                   {warning}
                 </Text>
