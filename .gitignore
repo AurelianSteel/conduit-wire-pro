@@ -6,3 +6,4 @@ dist/
 fastlane/AuthKey*.p8
 fastlane/.env
 fastlane/report.xml
+.backup-migration-20260227-121612/
