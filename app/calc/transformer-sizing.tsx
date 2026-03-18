@@ -11,6 +11,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useHistory } from '../../src/hooks/useHistory';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 import {
   calculateTransformerSpecs,
   calculateFLA,
@@ -40,6 +43,7 @@ export default function TransformerSizingScreen() {
   const [secondaryVoltage, setSecondaryVoltage] = useState<VoltageLevel>(208);
   const [impedancePercent, setImpedancePercent] = useState<string>('1.5');
   const [showResults, setShowResults] = useState(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const result = useMemo(() => {
     const kvaNum = parseFloat(kva);
@@ -317,6 +321,65 @@ export default function TransformerSizingScreen() {
               </Text>
             ))}
           </View>
+
+          <ShareButton
+            data={{
+              calculatorType: 'transformer-sizing',
+              calculatorTitle: 'Transformer Sizing Calculator',
+              inputs: {
+                kva: `${kva} kVA`,
+                phase: phase === 'three' ? '3-Phase' : 'Single-Phase',
+                primaryVoltage: `${primaryVoltage}V`,
+                secondaryVoltage: `${secondaryVoltage}V`,
+                impedance: `${impedancePercent}%`,
+              },
+              result: {
+                value: `${result.primaryFLA}A / ${result.secondaryFLA}A`,
+                label: 'Primary / Secondary FLA',
+                details: {
+                  turnsRatio: `${result.turnsRatio.toFixed(2)}:1`,
+                  faultCurrent: `${Math.round(result.faultCurrent).toLocaleString()}A`,
+                  primaryOCPD: `${result.primaryOCPD}A`,
+                  secondaryOCPD: `${result.secondaryOCPD}A`,
+                },
+              },
+              necArticle: '450.3',
+              necReference: 'NEC 2023 Article 450.3',
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={accentColor}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'transformer-sizing',
+              calculatorTitle: 'Transformer Sizing Calculator',
+              inputs: {
+                kva: `${kva} kVA`,
+                phase: phase === 'three' ? '3-Phase' : 'Single-Phase',
+                primaryVoltage: `${primaryVoltage}V`,
+                secondaryVoltage: `${secondaryVoltage}V`,
+                impedance: `${impedancePercent}%`,
+              },
+              result: {
+                value: `${result.primaryFLA}A / ${result.secondaryFLA}A`,
+                label: 'Primary / Secondary FLA',
+                details: {
+                  turnsRatio: `${result.turnsRatio.toFixed(2)}:1`,
+                  faultCurrent: `${Math.round(result.faultCurrent).toLocaleString()}A`,
+                  primaryOCPD: `${result.primaryOCPD}A`,
+                  secondaryOCPD: `${result.secondaryOCPD}A`,
+                },
+              },
+              necArticle: '450.3',
+              necReference: 'NEC 2023 Article 450.3',
+              timestamp: new Date(),
+            }}
+            accentColor={accentColor}
+          />
         </View>
       )}
 

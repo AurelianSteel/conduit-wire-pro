@@ -18,6 +18,9 @@ import {
 } from '../../src/types/pipeBending';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 type CalcMode = 'offset' | 'saddle' | 'ninety' | 'rolling';
 
@@ -48,6 +51,7 @@ export default function PipeBendingScreen() {
   const [rollingAngle, setRollingAngle] = useState<BendAngle>(30);
 
   // Quick reference
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
   const [showQuickRef, setShowQuickRef] = useState(false);
 
   const result = useMemo(() => {
@@ -450,6 +454,33 @@ export default function PipeBendingScreen() {
               </View>
             )}
 
+            <ShareButton
+              data={{
+                calculatorType: 'pipe-bending',
+                calculatorTitle: 'Pipe Bending Calculator',
+                inputs: {
+                  calcType: 'Offset',
+                  conduitSize,
+                  obstructionHeight: `${obstructionHeight}"`,
+                  offsetAngle: `${offsetAngle}°`,
+                },
+                result: {
+                  value: formatMeasurement(data.distanceBetweenBends),
+                  label: 'Distance Between Bends',
+                  details: {
+                    offset: formatMeasurement(data.obstructionHeight),
+                    shrinkage: formatMeasurement(data.shrinkage),
+                    gain: formatMeasurement(data.gain),
+                  },
+                },
+                necArticle: '358.26, 344.26',
+                necReference: 'NEC 2023 Articles 358.26, 344.26',
+                timestamp: new Date(),
+              }}
+              onPress={() => setShareSheetVisible(true)}
+              accentColor={accentColor}
+            />
+
             <LegalDisclaimer />
           </View>
         );
@@ -482,6 +513,31 @@ export default function PipeBendingScreen() {
                 ))}
               </View>
             )}
+
+            <ShareButton
+              data={{
+                calculatorType: 'pipe-bending',
+                calculatorTitle: 'Pipe Bending Calculator',
+                inputs: {
+                  calcType: `${data.saddleType === '3pt' ? '3-Point' : '4-Point'} Saddle`,
+                  conduitSize,
+                  obstructionWidth: `${obstructionWidth}"`,
+                  saddleAngle: `${saddleAngle}°`,
+                },
+                result: {
+                  value: data.marks.map((m, i) => `${i + 1}. ${formatMeasurement(m)}`).join(', '),
+                  label: 'Bend Marks',
+                  details: {
+                    shrinkage: formatMeasurement(data.shrinkage),
+                  },
+                },
+                necArticle: '358.26, 344.26',
+                necReference: 'NEC 2023 Articles 358.26, 344.26',
+                timestamp: new Date(),
+              }}
+              onPress={() => setShareSheetVisible(true)}
+              accentColor={accentColor}
+            />
 
             <LegalDisclaimer />
           </View>
@@ -518,6 +574,31 @@ export default function PipeBendingScreen() {
                 ))}
               </View>
             )}
+
+            <ShareButton
+              data={{
+                calculatorType: 'pipe-bending',
+                calculatorTitle: 'Pipe Bending Calculator',
+                inputs: {
+                  calcType: '90° Bend',
+                  conduitSize,
+                  legLength: `${legLength}"`,
+                },
+                result: {
+                  value: formatMeasurement(data.cutLength),
+                  label: 'Cut Length',
+                  details: {
+                    takeUp: formatMeasurement(data.takeUp),
+                    bendMark: formatMeasurement(data.bendMark),
+                  },
+                },
+                necArticle: '358.26, 344.26',
+                necReference: 'NEC 2023 Articles 358.26, 344.26',
+                timestamp: new Date(),
+              }}
+              onPress={() => setShareSheetVisible(true)}
+              accentColor={accentColor}
+            />
 
             <LegalDisclaimer />
           </View>
@@ -564,6 +645,34 @@ export default function PipeBendingScreen() {
               </View>
             )}
 
+            <ShareButton
+              data={{
+                calculatorType: 'pipe-bending',
+                calculatorTitle: 'Pipe Bending Calculator',
+                inputs: {
+                  calcType: 'Rolling Offset',
+                  conduitSize,
+                  verticalOffset: `${verticalOffset}"`,
+                  horizontalOffset: `${horizontalOffset}"`,
+                  rollingAngle: `${rollingAngle}°`,
+                },
+                result: {
+                  value: formatMeasurement(data.distanceBetweenBends),
+                  label: 'Distance Between Bends',
+                  details: {
+                    trueOffset: formatMeasurement(data.rollingOffset),
+                    travelLength: formatMeasurement(data.travelLength),
+                    shrinkage: formatMeasurement(data.shrinkage),
+                  },
+                },
+                necArticle: '358.26, 344.26',
+                necReference: 'NEC 2023 Articles 358.26, 344.26',
+                timestamp: new Date(),
+              }}
+              onPress={() => setShareSheetVisible(true)}
+              accentColor={accentColor}
+            />
+
             <LegalDisclaimer />
           </View>
         );
@@ -586,6 +695,27 @@ export default function PipeBendingScreen() {
       </View>
 
       {renderResults()}
+
+      <ShareSheet
+        visible={shareSheetVisible}
+        onClose={() => setShareSheetVisible(false)}
+        data={{
+          calculatorType: 'pipe-bending',
+          calculatorTitle: 'Pipe Bending Calculator',
+          inputs: {
+            calcType: calcMode === 'offset' ? 'Offset' : calcMode === 'saddle' ? `${saddleType === '3pt' ? '3-Point' : '4-Point'} Saddle` : calcMode === 'ninety' ? '90° Bend' : 'Rolling Offset',
+            conduitSize,
+          },
+          result: {
+            value: 'See calculation details',
+            label: 'Bend Calculation',
+          },
+          necArticle: '358.26, 344.26',
+          necReference: 'NEC 2023 Articles 358.26, 344.26',
+          timestamp: new Date(),
+        }}
+        accentColor={accentColor}
+      />
     </ScrollView>
   );
 }

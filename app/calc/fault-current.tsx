@@ -10,6 +10,9 @@ import {
 import { useTheme } from '../../src/hooks/useTheme';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 import { Ionicons } from '@expo/vector-icons';
 import {
   calculateFaultCurrent,
@@ -45,6 +48,7 @@ export default function FaultCurrentScreen() {
   const [conductorType, setConductorType] = useState<ConductorMaterial>('copper');
   const [includeMotor, setIncludeMotor] = useState<boolean>(false);
   const [motorHp, setMotorHp] = useState<string>('50');
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   // Calculate result
   const result = useMemo(() => {
@@ -363,6 +367,63 @@ export default function FaultCurrentScreen() {
               Safety margin: {result.safetyMargin.toFixed(0)}%
             </Text>
           </View>
+
+          <ShareButton
+            data={{
+              calculatorType: 'fault-current',
+              calculatorTitle: 'Fault Current Calculator',
+              inputs: {
+                kva: `${kva} kVA`,
+                primaryVoltage: `${primaryVoltage}V`,
+                secondaryVoltage: `${secondaryVoltage}V`,
+                impedance: `${impedance}%`,
+                phase: phase === 'three' ? '3-Phase' : 'Single-Phase',
+              },
+              result: {
+                value: formatFaultCurrent(result.totalFaultCurrent),
+                label: 'Total Available Fault Current',
+                details: {
+                  transformerFaultCurrent: formatFaultCurrent(result.transformerFaultCurrent),
+                  sccrRequired: result.sccrRequired,
+                  safetyMargin: `${result.safetyMargin.toFixed(0)}%`,
+                },
+              },
+              necArticle: '110.9, 110.10',
+              necReference: 'NEC 2023 Articles 110.9, 110.10',
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={accentColor}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'fault-current',
+              calculatorTitle: 'Fault Current Calculator',
+              inputs: {
+                kva: `${kva} kVA`,
+                primaryVoltage: `${primaryVoltage}V`,
+                secondaryVoltage: `${secondaryVoltage}V`,
+                impedance: `${impedance}%`,
+                phase: phase === 'three' ? '3-Phase' : 'Single-Phase',
+              },
+              result: {
+                value: formatFaultCurrent(result.totalFaultCurrent),
+                label: 'Total Available Fault Current',
+                details: {
+                  transformerFaultCurrent: formatFaultCurrent(result.transformerFaultCurrent),
+                  sccrRequired: result.sccrRequired,
+                  safetyMargin: `${result.safetyMargin.toFixed(0)}%`,
+                },
+              },
+              necArticle: '110.9, 110.10',
+              necReference: 'NEC 2023 Articles 110.9, 110.10',
+              timestamp: new Date(),
+            }}
+            accentColor={accentColor}
+          />
         </View>
       )}
 

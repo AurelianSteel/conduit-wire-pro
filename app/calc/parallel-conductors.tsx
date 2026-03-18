@@ -4,6 +4,9 @@ import { useTheme } from '../../src/hooks/useTheme';
 import { calculateParallelConductors, recommendParallelRuns } from '../../src/services/parallelConductorService';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function ParallelConductorsScreen() {
   const { colors } = useTheme();
@@ -15,6 +18,7 @@ export default function ParallelConductorsScreen() {
   const [terminalRating, setTerminalRating] = useState<60 | 75 | 90>(75);
   const [includeNeutral, setIncludeNeutral] = useState(false);
   const [showOptimizer, setShowOptimizer] = useState(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -278,6 +282,65 @@ export default function ParallelConductorsScreen() {
             • Each parallel set must have its own equipment ground{'\n'}
             • Minimum 1/0 AWG for parallel per NEC 310.10(G)
           </Text>
+
+          <ShareButton
+            data={{
+              calculatorType: 'parallel-conductors',
+              calculatorTitle: 'Parallel Conductors Calculator',
+              inputs: {
+                totalAmpacity: `${totalAmpacity}A`,
+                parallelRuns: numRuns,
+                material: material === 'copper' ? 'Copper' : 'Aluminum',
+                terminalRating: `${terminalRating}°C`,
+                includeNeutral: includeNeutral ? 'Yes' : 'No',
+              },
+              result: {
+                value: `${result.parallelSets} × ${result.recommendedSize} AWG`,
+                label: 'Parallel Configuration',
+                details: {
+                  ampacityPerConductor: `${result.ampacityPerConductor}A`,
+                  totalAchieved: `${result.totalAmpacityAchieved}A`,
+                  headroom: `${result.headroomPercent}%`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={accentColor}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'parallel-conductors',
+              calculatorTitle: 'Parallel Conductors Calculator',
+              inputs: {
+                totalAmpacity: `${totalAmpacity}A`,
+                parallelRuns: numRuns,
+                material: material === 'copper' ? 'Copper' : 'Aluminum',
+                terminalRating: `${terminalRating}°C`,
+                includeNeutral: includeNeutral ? 'Yes' : 'No',
+              },
+              result: {
+                value: `${result.parallelSets} × ${result.recommendedSize} AWG`,
+                label: 'Parallel Configuration',
+                details: {
+                  ampacityPerConductor: `${result.ampacityPerConductor}A`,
+                  totalAchieved: `${result.totalAmpacityAchieved}A`,
+                  headroom: `${result.headroomPercent}%`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            accentColor={accentColor}
+          />
 
           <LegalDisclaimer />
           <Text style={[styles.reference, { color: colors.textTertiary }]}>

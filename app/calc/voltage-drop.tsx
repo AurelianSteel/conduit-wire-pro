@@ -21,6 +21,9 @@ import {
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { useHistory } from '../../src/hooks/useHistory';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function VoltageDropScreen() {
   const { colors } = useTheme();
@@ -36,6 +39,7 @@ export default function VoltageDropScreen() {
   const [current, setCurrent] = useState('20');
   const [distance, setDistance] = useState('100');
   const [showResults, setShowResults] = useState(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const selectedVoltage = systemVoltages[voltageIdx];
 
@@ -225,6 +229,61 @@ export default function VoltageDropScreen() {
               {getVDStatusLabel(best.voltageDropPercent)}
             </Text>
           </View>
+
+          <ShareButton
+            data={{
+              calculatorType: 'voltage-drop',
+              calculatorTitle: 'Voltage Drop Calculator',
+              inputs: {
+                voltage: selectedVoltage.label,
+                material: material === 'copper' ? 'Copper' : 'Aluminum',
+                current: `${current}A`,
+                distance: `${distance}ft`,
+              },
+              result: {
+                value: formatWireSize(best.wireSize),
+                label: 'Recommended Wire Size',
+                details: {
+                  voltageDropPercent: `${best.voltageDropPercent}%`,
+                  voltageDrop: `${best.voltageDrop}V`,
+                  voltageAtLoad: `${best.voltageAtLoad}V`,
+                },
+              },
+              necArticle: '210.19, 215.2',
+              necReference: 'NEC 2023 Articles 210.19, 215.2',
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={colors.success}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'voltage-drop',
+              calculatorTitle: 'Voltage Drop Calculator',
+              inputs: {
+                voltage: selectedVoltage.label,
+                material: material === 'copper' ? 'Copper' : 'Aluminum',
+                current: `${current}A`,
+                distance: `${distance}ft`,
+              },
+              result: {
+                value: formatWireSize(best.wireSize),
+                label: 'Recommended Wire Size',
+                details: {
+                  voltageDropPercent: `${best.voltageDropPercent}%`,
+                  voltageDrop: `${best.voltageDrop}V`,
+                  voltageAtLoad: `${best.voltageAtLoad}V`,
+                },
+              },
+              necArticle: '210.19, 215.2',
+              necReference: 'NEC 2023 Articles 210.19, 215.2',
+              timestamp: new Date(),
+            }}
+            accentColor={colors.success}
+          />
 
           {/* Wire Comparison Table */}
           <View style={[styles.tableCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>

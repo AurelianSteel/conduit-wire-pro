@@ -5,6 +5,9 @@ import { calculateDeratedAmpacity } from '../../src/services/ampacityService';
 import { WireSize, InsulationType, ConductorCountRange, AmpacityInput } from '../../src/types/ampacity';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function WireAmpacityScreen() {
   const { colors } = useTheme();
@@ -15,6 +18,7 @@ export default function WireAmpacityScreen() {
   const [ambientTempC, setAmbientTempC] = useState<number>(30);
   const [conductorCountRange, setConductorCountRange] = useState<ConductorCountRange>('1-3');
   const [continuousLoad, setContinuousLoad] = useState<boolean>(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -178,6 +182,65 @@ export default function WireAmpacityScreen() {
           <Text style={[styles.finalAmpacity, { color: accentColor }]}>
             {result.deratedAmpacity}A
           </Text>
+
+          <ShareButton
+            data={{
+              calculatorType: 'wire-ampacity',
+              calculatorTitle: 'Wire Ampacity Calculator',
+              inputs: {
+                wireSize: `#${wireSize} AWG`,
+                insulationType,
+                ambientTemp: `${ambientTempC}°C`,
+                conductorCount: conductorCountRange,
+                continuousLoad: continuousLoad ? 'Yes' : 'No',
+              },
+              result: {
+                value: `${result.deratedAmpacity}A`,
+                label: 'Derated Ampacity',
+                details: {
+                  baseAmpacity: `${result.baseAmpacity}A`,
+                  tempFactor: `×${result.temperatureCorrectionFactor.toFixed(2)}`,
+                  adjustmentFactor: `×${result.adjustmentFactor.toFixed(2)}`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={accentColor}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'wire-ampacity',
+              calculatorTitle: 'Wire Ampacity Calculator',
+              inputs: {
+                wireSize: `#${wireSize} AWG`,
+                insulationType,
+                ambientTemp: `${ambientTempC}°C`,
+                conductorCount: conductorCountRange,
+                continuousLoad: continuousLoad ? 'Yes' : 'No',
+              },
+              result: {
+                value: `${result.deratedAmpacity}A`,
+                label: 'Derated Ampacity',
+                details: {
+                  baseAmpacity: `${result.baseAmpacity}A`,
+                  tempFactor: `×${result.temperatureCorrectionFactor.toFixed(2)}`,
+                  adjustmentFactor: `×${result.adjustmentFactor.toFixed(2)}`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            accentColor={accentColor}
+          />
 
           <LegalDisclaimer />
           <Text style={[styles.reference, { color: colors.textTertiary }]}>

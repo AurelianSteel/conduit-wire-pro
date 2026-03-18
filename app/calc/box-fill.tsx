@@ -17,6 +17,9 @@ import {
 } from '../../src/data/box-dimensions';
 import { calculateBoxFill } from '../../src/engines/box-fill-engine';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 const WIRE_SIZES = [14, 12, 10, 8, 6];
 
@@ -41,6 +44,7 @@ export default function BoxFillScreen() {
   const [showAddConductorsModal, setShowAddConductorsModal] = useState(false);
   const [newWireSize, setNewWireSize] = useState(14);
   const [newWireCount, setNewWireCount] = useState(1);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const dummyBox: BoxSize = useMemo(() => ({
     id: 'dummy',
@@ -233,6 +237,63 @@ export default function BoxFillScreen() {
           {conductorSummary || 'No conductors added'}
         </Text>
       </View>
+
+      {minimumBox && (
+        <ShareButton
+          data={{
+            calculatorType: 'box-fill',
+            calculatorTitle: 'Box Fill Calculator',
+            inputs: {
+              conductors: conductorSummary,
+              totalConductors,
+              deviceYokes,
+              internalClamps: hasClamps ? 'Yes' : 'No',
+              equipmentGrounds: hasGrounds ? 'Yes' : 'No',
+            },
+            result: {
+              value: minimumBox.name,
+              label: 'Minimum Box Size',
+              details: {
+                volume: `${minimumBox.volumeIn3} in³`,
+                requiredVolume: `${totalVolume.toFixed(2)} in³`,
+              },
+            },
+            necArticle: '314.16',
+            necReference: 'NEC 2023 Article 314.16',
+            timestamp: new Date(),
+          }}
+          onPress={() => setShareSheetVisible(true)}
+          accentColor={colors.secondary}
+        />
+      )}
+
+      <ShareSheet
+        visible={shareSheetVisible}
+        onClose={() => setShareSheetVisible(false)}
+        data={{
+          calculatorType: 'box-fill',
+          calculatorTitle: 'Box Fill Calculator',
+          inputs: {
+            conductors: conductorSummary,
+            totalConductors,
+            deviceYokes,
+            internalClamps: hasClamps ? 'Yes' : 'No',
+            equipmentGrounds: hasGrounds ? 'Yes' : 'No',
+          },
+          result: {
+            value: minimumBox ? minimumBox.name : 'No standard box',
+            label: 'Minimum Box Size',
+            details: minimumBox ? {
+              volume: `${minimumBox.volumeIn3} in³`,
+              requiredVolume: `${totalVolume.toFixed(2)} in³`,
+            } : undefined,
+          },
+          necArticle: '314.16',
+          necReference: 'NEC 2023 Article 314.16',
+          timestamp: new Date(),
+        }}
+        accentColor={colors.secondary}
+      />
 
       <View style={[styles.breakdownCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
         <Text style={[styles.breakdownTitle, { color: colors.text }]}>Volume Breakdown</Text>

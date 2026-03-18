@@ -5,6 +5,9 @@ import { calculateServiceFeeder } from '../../src/services/serviceFeederService'
 import { ServiceFeederInput } from '../../src/types/serviceFeeder';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function ServiceFeederScreen() {
   const { colors } = useTheme();
@@ -32,6 +35,7 @@ export default function ServiceFeederScreen() {
   
   // Voltage
   const [voltage, setVoltage] = useState<string>('240');
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -366,6 +370,67 @@ export default function ServiceFeederScreen() {
               ))}
             </View>
           )}
+
+          <ShareButton
+            data={{
+              calculatorType: 'service-feeder',
+              calculatorTitle: 'Service Feeder Calculator',
+              inputs: {
+                squareFootage: `${squareFootage} sq ft`,
+                smallApplianceCircuits,
+                laundryCircuit: includeLaundryCircuit ? 'Yes' : 'No',
+                range: includeRange ? `${rangeKW} kW` : 'None',
+                dryer: includeDryer ? `${dryerKW} kW` : 'None',
+                hvac: parseFloat(heatingKW) > parseFloat(coolingKW) ? `${heatingKW} kW heat` : `${coolingKW} kW cool`,
+                voltage: `${voltage}V`,
+              },
+              result: {
+                value: `${result.recommendedService}A`,
+                label: 'Recommended Service',
+                details: {
+                  totalLoad: `${result.breakdown.demandAdjustedVa.toLocaleString()} VA`,
+                  utilization: `${result.utilizationPercent}%`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={accentColor}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'service-feeder',
+              calculatorTitle: 'Service Feeder Calculator',
+              inputs: {
+                squareFootage: `${squareFootage} sq ft`,
+                smallApplianceCircuits,
+                laundryCircuit: includeLaundryCircuit ? 'Yes' : 'No',
+                range: includeRange ? `${rangeKW} kW` : 'None',
+                dryer: includeDryer ? `${dryerKW} kW` : 'None',
+                hvac: parseFloat(heatingKW) > parseFloat(coolingKW) ? `${heatingKW} kW heat` : `${coolingKW} kW cool`,
+                voltage: `${voltage}V`,
+              },
+              result: {
+                value: `${result.recommendedService}A`,
+                label: 'Recommended Service',
+                details: {
+                  totalLoad: `${result.breakdown.demandAdjustedVa.toLocaleString()} VA`,
+                  utilization: `${result.utilizationPercent}%`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            accentColor={accentColor}
+          />
 
           <LegalDisclaimer />
           {/* NEC Reference */}

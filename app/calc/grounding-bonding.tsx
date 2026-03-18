@@ -10,6 +10,9 @@ import {
 } from '../../src/services/groundingBondingService';
 import { ConductorSize, GroundingMaterial, ElectrodeType } from '../../src/types/groundingBonding';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 type ActiveTab = 'egc' | 'gec' | 'mbj';
 
@@ -24,6 +27,7 @@ export default function GroundingBondingScreen() {
   const [conductorSize, setConductorSize] = useState<ConductorSize>('4/0');
   const [electrodeType, setElectrodeType] = useState<ElectrodeType>('standard');
   const [showConductorPicker, setShowConductorPicker] = useState(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const result = useMemo(() => {
     if (activeTab === 'egc') {
@@ -197,10 +201,62 @@ export default function GroundingBondingScreen() {
       <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
         <Text style={[styles.resultLabel, { color: colors.textSecondary }]}>MINIMUM SIZE</Text>
         <Text style={[styles.resultValue, { color: accentColor }]}>{result.minimumSize}</Text>
-          <LegalDisclaimer />
         <Text style={[styles.resultReference, { color: colors.textSecondary }]}>NEC Reference: {result.necReference}</Text>
         <Text style={[styles.resultDetails, { color: colors.text }]}>{result.details}</Text>
       </View>
+
+      <ShareButton
+        data={{
+          calculatorType: 'grounding-bonding',
+          calculatorTitle: 'Grounding & Bonding Calculator',
+          inputs: {
+            calculationType: activeTab === 'egc' ? 'EGC Sizing' : activeTab === 'gec' ? 'GEC Sizing' : 'MBJ Sizing',
+            material: material === 'copper' ? 'Copper' : 'Aluminum',
+            ...(activeTab === 'egc' ? { ocpdRating: `${ocpdRating}A` } : { conductorSize }),
+            ...(activeTab !== 'egc' && { electrodeType }),
+          },
+          result: {
+            value: result.minimumSize,
+            label: 'Minimum Conductor Size',
+            details: {
+              necReference: result.necReference,
+            },
+          },
+          necArticle: result.necReference.split(' ')[1] || result.necReference,
+          necReference: `NEC 2023 ${result.necReference}`,
+          timestamp: new Date(),
+        }}
+        onPress={() => setShareSheetVisible(true)}
+        accentColor={accentColor}
+      />
+
+      <ShareSheet
+        visible={shareSheetVisible}
+        onClose={() => setShareSheetVisible(false)}
+        data={{
+          calculatorType: 'grounding-bonding',
+          calculatorTitle: 'Grounding & Bonding Calculator',
+          inputs: {
+            calculationType: activeTab === 'egc' ? 'EGC Sizing' : activeTab === 'gec' ? 'GEC Sizing' : 'MBJ Sizing',
+            material: material === 'copper' ? 'Copper' : 'Aluminum',
+            ...(activeTab === 'egc' ? { ocpdRating: `${ocpdRating}A` } : { conductorSize }),
+            ...(activeTab !== 'egc' && { electrodeType }),
+          },
+          result: {
+            value: result.minimumSize,
+            label: 'Minimum Conductor Size',
+            details: {
+              necReference: result.necReference,
+            },
+          },
+          necArticle: result.necReference.split(' ')[1] || result.necReference,
+          necReference: `NEC 2023 ${result.necReference}`,
+          timestamp: new Date(),
+        }}
+        accentColor={accentColor}
+      />
+
+      <LegalDisclaimer />
     </ScrollView>
   );
 }

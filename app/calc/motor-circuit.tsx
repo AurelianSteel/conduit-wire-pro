@@ -6,6 +6,9 @@ import { MotorHP, MotorVoltage } from '../../src/data/motor-fla-data';
 import { ConductorMaterial } from '../../src/types/motor';
 import { Spacing, FontSizes, BorderRadius } from '../../src/theme';
 import { LegalDisclaimer } from '../../src/components/LegalDisclaimer';
+import { ShareButton } from '../../src/components/ShareButton';
+import { ShareSheet } from '../../src/components/ShareSheet';
+import { ShareData } from '../../src/services/shareService';
 
 export default function MotorCircuitScreen() {
   const { colors } = useTheme();
@@ -16,6 +19,7 @@ export default function MotorCircuitScreen() {
   const [material, setMaterial] = useState<ConductorMaterial>('copper');
   const [terminalRating, setTerminalRating] = useState<60 | 75 | 90>(75);
   const [continuousLoad, setContinuousLoad] = useState(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const result = useMemo(() => {
     try {
@@ -234,6 +238,67 @@ export default function MotorCircuitScreen() {
           <Text style={[styles.resultValue, { color: colors.text }]}>
             Range: {result.overloadMin}A - {result.overloadMax}A
           </Text>
+
+          <ShareButton
+            data={{
+              calculatorType: 'motor-circuit',
+              calculatorTitle: 'Motor Circuit Calculator',
+              inputs: {
+                hp,
+                voltage: voltageOptions.find(v => v.value === voltage)?.label || voltage,
+                material: material === 'copper' ? 'Copper' : 'Aluminum',
+                terminalRating: `${terminalRating}°C`,
+                continuousLoad: continuousLoad ? 'Yes' : 'No',
+              },
+              result: {
+                value: `#${result.recommendedConductorSize} AWG`,
+                label: 'Recommended Conductor',
+                details: {
+                  fla: `${result.fla}A`,
+                  minAmpacity: `${result.minConductorAmpacity}A`,
+                  ocpd: result.recommendedOCPD,
+                  disconnect: `${result.minDisconnectRating}A`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            onPress={() => setShareSheetVisible(true)}
+            accentColor={accentColor}
+          />
+
+          <ShareSheet
+            visible={shareSheetVisible}
+            onClose={() => setShareSheetVisible(false)}
+            data={{
+              calculatorType: 'motor-circuit',
+              calculatorTitle: 'Motor Circuit Calculator',
+              inputs: {
+                hp,
+                voltage: voltageOptions.find(v => v.value === voltage)?.label || voltage,
+                material: material === 'copper' ? 'Copper' : 'Aluminum',
+                terminalRating: `${terminalRating}°C`,
+                continuousLoad: continuousLoad ? 'Yes' : 'No',
+              },
+              result: {
+                value: `#${result.recommendedConductorSize} AWG`,
+                label: 'Recommended Conductor',
+                details: {
+                  fla: `${result.fla}A`,
+                  minAmpacity: `${result.minConductorAmpacity}A`,
+                  ocpd: result.recommendedOCPD,
+                  disconnect: `${result.minDisconnectRating}A`,
+                },
+              },
+              necArticle: result.necArticle,
+              necReference: `NEC 2023 Article ${result.necArticle}`,
+              warnings: result.warnings.length > 0 ? result.warnings : undefined,
+              timestamp: new Date(),
+            }}
+            accentColor={accentColor}
+          />
 
           <LegalDisclaimer />
           <Text style={[styles.reference, { color: colors.textTertiary }]}>
